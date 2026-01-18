@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CAB Event Survey System</title>
+
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --glass-surface: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-main: #ffffff;
+            --text-muted: #98989d;
+            --gradient-accent: linear-gradient(135deg, #0A84FF, #BF5AF2);
+            --gradient-fire: linear-gradient(135deg, #FF9500, #FF3B30);
+            --gradient-success: linear-gradient(135deg, #34C759, #30B0C7);
+            --radius-card: 24px;
+            --radius-pill: 100px;
+            --radius-btn: 14px;
+            --blur: 40px;
+            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: var(--font-stack); color: var(--text-main); background-color: var(--bg-dark); min-height: 100vh; padding-top: 40px; overflow-x: hidden; }
+        .frosted { background: var(--glass-surface); backdrop-filter: blur(var(--blur)); border: 1px solid var(--glass-border); }
+        .app-container { max-width: 1280px; margin: 0 auto; padding: 0 24px; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .view { display: none; opacity: 0; transform: translateY(10px); }
+        .view.active { display: block; opacity: 1; transform: translateY(0); animation: fadeUp 0.4s ease forwards; }
+
+        .hero-banner { width: 100%; max-width: 600px; margin: 0 auto 32px; border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); background: #111; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .hero-banner img { width: 100%; height: auto; display: block; }
+
+        .survey-card { max-width: 600px; margin: 0 auto 40px; padding: 32px; border-radius: var(--radius-card); }
+        .form-group { margin-bottom: 24px; }
+        .form-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        input.control-item, select.control-item, textarea.control-item { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 20px; border-radius: var(--radius-btn); font-family: inherit; font-size: 1rem; outline: none; transition: 0.2s; }
+        textarea.control-item { min-height: 100px; resize: vertical; }
+        .control-item:focus { border-color: #0A84FF; background: rgba(255,255,255,0.12); }
+
+        .rating-stars { display: flex; gap: 10px; margin-top: 8px; }
+        .star { font-size: 2.5rem; cursor: pointer; color: rgba(255,255,255,0.1); transition: 0.2s; }
+        .star.selected { color: #FFD60A; }
+
+        #dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; margin-bottom: 60px; }
+        .card { border-radius: var(--radius-card); overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; height: 100%; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); }
+        .card-header { position: relative; height: 160px; border-bottom: 1px solid var(--glass-border); }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 24px; flex: 1; }
+        
+        .btn { padding: 14px 24px; border-radius: var(--radius-btn); font-weight: 700; cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 0.95rem; }
+        .btn-primary { background: var(--gradient-accent); color: white; }
+        .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+
+        .list-manager { margin-top: 10px; max-height: 250px; overflow-y: auto; padding-right: 8px; }
+        .list-row { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 10px 16px; border-radius: 12px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.1); gap: 12px; }
+        .list-name { flex: 1; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .market-toggle { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+        .list-remove { color: var(--gradient-fire); cursor: pointer; font-size: 1.2rem; font-weight: bold; width: 24px; text-align: center; }
+
+        .modal { position: fixed; inset: 0; z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); }
+        .modal-content { position: relative; width: 100%; max-width: 400px; background: #111; border-radius: 28px; padding: 32px; border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+
+        .loader { display: none; width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: rotation 1s linear infinite; margin-left: 10px; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 16px 32px; border-radius: var(--radius-pill); background: var(--gradient-success); font-weight: 700; z-index: 2000; display: none; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .settings-section { margin-bottom: 30px; }
+        .settings-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; color: #fff; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        @media(max-width: 768px) { 
+            .hero-banner { margin-bottom: 20px; width: calc(100% - 32px); } 
+            .settings-grid { grid-template-columns: 1fr; }
+            .star { font-size: 2rem; } 
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="hero-banner" id="bannerContainer">
+        <img id="bannerImg" src="https://i.imgur.com/HJTTEzA.png" alt="CAB Banner" onerror="this.style.display='none'">
+    </div>
+
+    <!-- STUDENT SURVEY VIEW (DEFAULT) -->
+    <div id="surveyView" class="view active">
+        <div class="frosted survey-card">
+            <h3 style="margin-top:0" id="surveyTitle">Event Experience Survey</h3>
+            <p id="surveyDesc" style="color: var(--text-muted); margin-bottom: 30px; line-height: 1.6;">Welcome to the student feedback portal. Help us build a better campus experience.</p>
+
+            <div class="form-group">
+                <label class="form-label" id="label-studentID">Student ID Number</label>
+                <input type="number" id="formStudentID" class="control-item" placeholder="Enter ID..." />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" id="label-eventSelect">Which event did you attend?</label>
+                <select id="formEvent" class="control-item" onchange="checkEventType()"><option value="">Loading events...</option></select>
+            </div>
+
+            <!-- CAB BRANCH -->
+            <div id="branchCAB">
+                <div class="form-group">
+                    <label class="form-label" id="label-cabRating">How would you rate it?</label>
+                    <div class="rating-stars cab-stars">
+                        <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-cabFirstTime">Was this your first time attending a CAB event?</label>
+                    <select id="formFirstTime" class="control-item"><option value="Yes">Yes</option><option value="No">No</option></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-cabHear">How did you hear about the event?</label>
+                    <select id="formHearAbout" class="control-item"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-cabImprove">What would you change or improve for next time?</label>
+                    <textarea id="formImprove" class="control-item"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-cabLikely">How likely are you to attend again?</label>
+                    <select id="formLikely" class="control-item">
+                        <option value="Very Likely">Very Likely</option><option value="Likely">Likely</option><option value="Neutral">Neutral</option><option value="Unlikely">Unlikely</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-cabStaff">Did any CAB Staff connect with you?</label>
+                    <textarea id="formStaff" class="control-item"></textarea>
+                </div>
+            </div>
+
+            <!-- MARKET BRANCH -->
+            <div id="branchMarket" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label" id="label-mktRating">How would you rate the Student Market?</label>
+                    <div class="rating-stars mkt-stars">
+                        <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-mktEnjoy">What did you enjoy most about this market?</label>
+                    <textarea id="mktEnjoy" class="control-item"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-mktVariety">How satisfied were you with the variety of vendors?</label>
+                    <select id="mktVariety" class="control-item">
+                        <option value="Very Satisfied">Very Satisfied</option><option value="Satisfied">Satisfied</option><option value="Neutral">Neutral</option><option value="Unsatisfied">Unsatisfied</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-mktPurchase">Did you make a purchase at the market?</label>
+                    <select id="mktPurchase" class="control-item"><option value="Yes">Yes</option><option value="No">No</option></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" id="label-comments">Any additional comments or suggestions?</label>
+                <textarea id="formComments" class="control-item"></textarea>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%" id="submitBtn" onclick="submitSurvey()">
+                <span>Submit Feedback</span><div class="loader" id="submitLoader"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- SETTINGS VIEW (ADMIN ONLY) -->
+    <div id="settingsView" class="view">
+        <div class="frosted survey-card" style="max-width: 1000px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="margin:0">Admin Console</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-ghost" style="padding: 8px 16px;" onclick="switchView('dashboard')">Analytics</button>
+                    <button class="btn btn-ghost" style="padding: 8px 16px;" onclick="switchView('survey')">Exit Admin</button>
+                </div>
+            </div>
+            
+            <div class="settings-grid">
+                <!-- COL 1 -->
+                <div>
+                    <div class="settings-section">
+                        <div class="settings-title">Event List</div>
+                        <div id="event-list-manager" class="list-manager" style="margin-bottom: 12px;"></div>
+                        <div class="form-group" style="display:flex; gap:8px;">
+                            <input type="text" id="newEventName" class="control-item" placeholder="Add new event..." />
+                            <button class="btn btn-primary" onclick="addEventUI()">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-title">Global Settings</div>
+                        <div class="form-group">
+                            <label class="form-label">Banner Image URL</label>
+                            <input type="text" id="setHeaderImg" class="control-item" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Intro Text</label>
+                            <textarea id="setDesc" class="control-item" style="min-height:80px"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hear About Options</label>
+                            <textarea id="setHear" class="control-item" style="min-height:80px"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="color: var(--gradient-fire);">Update Master Password</label>
+                            <input type="password" id="setNewPass" class="control-item" placeholder="Change password..." />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COL 2 -->
+                <div>
+                    <div class="settings-section">
+                        <div class="settings-title">Question Wording (CAB)</div>
+                        <div class="form-group"><label class="form-label">Student ID</label><input type="text" id="q-studentID" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Event Select</label><input type="text" id="q-eventSelect" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Rating</label><input type="text" id="q-cabRating" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">First Time</label><input type="text" id="q-cabFirstTime" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Hear About</label><input type="text" id="q-cabHear" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Improvements</label><input type="text" id="q-cabImprove" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Likely Again</label><input type="text" id="q-cabLikely" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Staff Connect</label><input type="text" id="q-cabStaff" class="control-item" /></div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-title">Question Wording (Market)</div>
+                        <div class="form-group"><label class="form-label">Market Rating</label><input type="text" id="q-mktRating" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Enjoyed Most</label><input type="text" id="q-mktEnjoy" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Variety Sat</label><input type="text" id="q-mktVariety" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Purchase Made</label><input type="text" id="q-mktPurchase" class="control-item" /></div>
+                        <div class="form-group"><label class="form-label">Comments (Shared)</label><input type="text" id="q-comments" class="control-item" /></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                <button class="btn btn-primary" style="flex:2" id="saveConfigBtn" onclick="saveAdminSettings()">
+                    <span>Save All Changes</span><div class="loader" id="saveLoader"></div>
+                </button>
+                <button class="btn btn-ghost" style="flex:1" onclick="syncSheetData()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="view">
+        <div style="margin-bottom: 40px; display:flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <input id="search" class="control-item" type="text" placeholder="Search events..." style="width:250px" />
+            <button onclick="syncSheetData()" class="btn btn-ghost">🔄 Refresh</button>
+            <button onclick="switchView('settings')" class="btn btn-ghost">⚙️ Settings</button>
+            <button onclick="switchView('survey')" class="btn btn-ghost">Exit Admin</button>
+        </div>
+        <div id="dashboard"></div>
+    </div>
+
+    <footer style="margin-top:auto; display:flex; flex-direction:column; align-items:center; padding:60px 0; gap:16px; border-top:1px solid var(--glass-border);">
+        <button class="btn btn-ghost" id="adminLoginBtn" style="font-size:0.8rem; opacity:0.6;" onclick="showGate()">Admin Access</button>
+        <div style="text-align:center; color:var(--text-muted); font-size:0.75rem;">Powered by the Canyon Activities Board</div>
+    </footer>
+</div>
+
+<!-- Password Modal -->
+<div id="gateModal" class="modal">
+    <div class="modal-bg" onclick="hideGate()"></div>
+    <div class="modal-content">
+        <h3 style="margin:0 0 16px 0">Authorization Required</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Enter board password to unlock admin console.</p>
+        <input type="password" id="adminPass" class="control-item" placeholder="Password" style="margin-bottom:20px" onkeyup="if(event.key==='Enter') verifyAdmin()"/>
+        <button class="btn btn-primary" style="width:100%" id="gateBtn" onclick="verifyAdmin()">
+            <span>Unlock Dashboard</span><div class="loader" id="gateLoader"></div>
+        </button>
+    </div>
+</div>
+
+<div id="toast">Feedback Submitted!</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH-0JQEakxV47apI5pEknqRcvF7Q9sUK-ioXZ4ffxHCbAxn1J1cP7G8X4tBHeksyxk/exec"; 
+    
+    let state = { 
+        responses: [], 
+        config: {}, 
+        currentRating: 0, 
+        view: 'survey', 
+        isAdmin: false, 
+        isMarket: false,
+        tempEvents: [],
+        questionKeys: [
+            'studentID', 'eventSelect', 'cabRating', 'cabFirstTime', 'cabHear', 'cabImprove', 'cabLikely', 'cabStaff', 
+            'mktRating', 'mktEnjoy', 'mktVariety', 'mktPurchase', 'comments'
+        ]
+    };
+
+    async function init() {
+        switchView('survey'); 
+        syncSheetData();
+    }
+
+    function switchView(viewName) {
+        state.view = viewName;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const target = document.getElementById(viewName + 'View');
+        if (target) target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function syncSheetData() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            state.responses = data.overview;
+            state.config = data.config;
+            
+            const all = (state.config.Events || "").split(',').map(s => s.trim()).filter(Boolean);
+            const mkt = (state.config.MarketEvents || "").split(',').map(s => s.trim()).filter(Boolean);
+            state.tempEvents = all.map(name => ({ name, isMarket: mkt.includes(name) }));
+
+            applyConfig();
+            if (state.view === 'dashboard') renderDashboard();
+        } catch (e) { console.error("Sync error", e); }
+    }
+
+    /**
+     * SMART CONFIG HYDRATION
+     * Ensures questions are never blank by using current HTML labels as fallbacks.
+     */
+    function applyConfig() {
+        if (state.config.HeaderImageURL) document.getElementById('bannerImg').src = state.config.HeaderImageURL;
+        if (state.config.SurveyDescription) document.getElementById('surveyDesc').textContent = state.config.SurveyDescription;
+        
+        state.questionKeys.forEach(key => {
+            const labelEl = document.getElementById('label-' + key);
+            const inputEl = document.getElementById('q-' + key);
+            const configKey = 'q-' + key;
+            const savedValue = state.config[configKey];
+            
+            if (savedValue) {
+                if (labelEl) labelEl.textContent = savedValue;
+            }
+
+            // Fallback to label text if config is empty so inputs aren't blank
+            if (inputEl) {
+                inputEl.value = savedValue || (labelEl ? labelEl.textContent : "");
+            }
+        });
+
+        document.getElementById('formEvent').innerHTML = '<option value="">Select an event...</option>' + 
+            state.tempEvents.map(e => `<option value="${e.name}">${e.name}</option>`).join('');
+        
+        const hearOptions = (state.config.HearAboutOptions || "Instagram,Email,Word of Mouth,Flyer").split(',').map(s => s.trim());
+        document.getElementById('formHearAbout').innerHTML = '<option value="">Select...</option>' + 
+            hearOptions.map(h => `<option value="${h}">${h}</option>`).join('');
+
+        document.getElementById('setHeaderImg').value = state.config.HeaderImageURL || "";
+        document.getElementById('setDesc').value = state.config.SurveyDescription || "";
+        document.getElementById('setHear').value = state.config.HearAboutOptions || "";
+        
+        renderEventSettings();
+    }
+
+    function renderEventSettings() {
+        const box = document.getElementById('event-list-manager');
+        box.innerHTML = state.tempEvents.map((ev, idx) => `
+            <div class="list-row">
+                <span class="list-name">${ev.name}</span>
+                <label class="market-toggle">
+                    <input type="checkbox" ${ev.isMarket ? 'checked' : ''} onchange="toggleMarketFlag(${idx}, this.checked)"> Market
+                </label>
+                <div class="list-remove" onclick="removeEventUI(${idx})">&times;</div>
+            </div>
+        `).join('');
+    }
+
+    function toggleMarketFlag(idx, val) { state.tempEvents[idx].isMarket = val; }
+    function removeEventUI(idx) { state.tempEvents.splice(idx, 1); renderEventSettings(); }
+    function addEventUI() {
+        const name = document.getElementById('newEventName').value.trim();
+        if(!name) return;
+        state.tempEvents.push({ name, isMarket: false });
+        document.getElementById('newEventName').value = "";
+        renderEventSettings();
+    }
+
+    function checkEventType() {
+        const selected = document.getElementById('formEvent').value;
+        const evData = state.tempEvents.find(e => e.name === selected);
+        state.isMarket = evData ? evData.isMarket : false;
+        document.getElementById('branchCAB').style.display = state.isMarket ? 'none' : 'block';
+        document.getElementById('branchMarket').style.display = state.isMarket ? 'block' : 'none';
+        
+        const qTitle = state.isMarket ? (state.config['q-eventSelect'] || "Student Market Survey") : (state.config['q-eventSelect'] || "Event Experience Survey");
+        document.getElementById('surveyTitle').textContent = qTitle;
+        
+        state.currentRating = 0;
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+    }
+
+    function setRating(val) {
+        state.currentRating = val;
+        const stars = state.isMarket ? document.querySelectorAll('.mkt-stars .star') : document.querySelectorAll('.cab-stars .star');
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+        stars.forEach((s, i) => { if(i < val) s.classList.add('selected'); });
+    }
+
+    async function submitSurvey() {
+        const base = {
+            studentID: document.getElementById('formStudentID').value,
+            event: document.getElementById('formEvent').value,
+            rating: state.currentRating,
+            comments: document.getElementById('formComments').value,
+            isMarket: state.isMarket
+        };
+        if (!base.event || base.rating === 0) return showToast("Select event and rating", true);
+        const data = state.isMarket ? {
+            ...base,
+            enjoy: document.getElementById('mktEnjoy').value,
+            variety: document.getElementById('mktVariety').value,
+            purchase: document.getElementById('mktPurchase').value
+        } : {
+            ...base,
+            firstTime: document.getElementById('formFirstTime').value,
+            hearAbout: document.getElementById('formHearAbout').value,
+            improve: document.getElementById('formImprove').value,
+            likelyToReturn: document.getElementById('formLikely').value,
+            staffConnect: document.getElementById('formStaff').value
+        };
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true; document.getElementById('submitLoader').style.display = "block";
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            showToast("Feedback Submitted!");
+            setTimeout(() => location.reload(), 2000);
+        } catch (e) { showToast("Error", true); btn.disabled = false; }
+    }
+
+    function showGate() { document.getElementById('gateModal').classList.add('show'); }
+    function hideGate() { document.getElementById('gateModal').classList.remove('show'); document.getElementById('adminPass').value = ""; }
+
+    async function verifyAdmin() {
+        const pass = document.getElementById('adminPass').value;
+        const btn = document.getElementById('gateBtn');
+        btn.disabled = true; document.getElementById('gateLoader').style.display = "block";
+        try {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "verifyPassword", password: pass }) });
+            const result = await res.json();
+            if (result.success) { 
+                state.isAdmin = true; 
+                hideGate(); 
+                showToast("Access Granted");
+                document.getElementById('adminLoginBtn').textContent = "Admin Console";
+                switchView('settings'); 
+            } else { 
+                showToast("Incorrect Password", true); 
+            }
+        } catch (e) { showToast("Server Error", true); }
+        finally { btn.disabled = false; document.getElementById('gateLoader').style.display = "none"; }
+    }
+
+    async function saveAdminSettings() {
+        const allEventsStr = state.tempEvents.map(e => e.name).join(', ');
+        const marketEventsStr = state.tempEvents.filter(e => e.isMarket).map(e => e.name).join(', ');
+        const config = {
+            Events: allEventsStr,
+            MarketEvents: marketEventsStr,
+            HeaderImageURL: document.getElementById('setHeaderImg').value,
+            SurveyDescription: document.getElementById('setDesc').value,
+            HearAboutOptions: document.getElementById('setHear').value
+        };
+        state.questionKeys.forEach(key => {
+            config['q-' + key] = document.getElementById('q-' + key).value;
+        });
+        const newPass = document.getElementById('setNewPass').value.trim();
+        const btn = document.getElementById('saveConfigBtn');
+        btn.disabled = true; document.getElementById('saveLoader').style.display = "block";
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "updateConfig", config }) });
+            if (newPass) await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "changePassword", newPassword: newPass }) });
+            showToast("Settings Updated!");
+            await syncSheetData();
+            switchView('settings');
+        } catch (e) { showToast("Save Failed", true); }
+        finally { btn.disabled = false; document.getElementById('saveLoader').style.display = "none"; }
+    }
+
+    function renderDashboard() {
+        const dash = document.getElementById('dashboard');
+        const searchTerm = (document.getElementById('search').value || "").toLowerCase();
+        dash.innerHTML = "";
+        state.responses.filter(g => (g.eventname || "").toLowerCase().includes(searchTerm)).forEach(g => {
+            const card = document.createElement('div');
+            card.className = "frosted card";
+            const imgId = Math.abs((g.eventname||"").split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % 1000;
+            const img = g.imageurl || `https://picsum.photos/seed/${imgId}/600/400`;
+            card.innerHTML = `<div class="card-header"><img src="${img}" class="card-img"></div>
+                <div class="card-body"><h3>${g.eventname}</h3>
+                <div style="font-weight:800; color:#0A84FF;">★ ${Number(g.rating || 0).toFixed(1)} (${g.surveys || 0} responses)</div>
+                <p style="font-size:0.9rem; color:#b0b0b0; line-height:1.6;">${g.summary || "Summary pending feedback..."}</p></div>`;
+            dash.appendChild(card);
+        });
+    }
+
+    function showToast(msg, err) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.style.background = err ? 'var(--gradient-fire)' : 'var(--gradient-success)';
+        t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
