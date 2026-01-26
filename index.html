@@ -63,7 +63,6 @@
             outline: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
-        /* SPARKLE EFFECT ON CLICK/FOCUS */
         .control-item:focus { 
             border-color: #0A84FF; 
             background: rgba(255,255,255,0.12); 
@@ -100,6 +99,12 @@
         .list-name { flex: 1; font-size: 0.95rem; line-height: 1.4; }
         .list-remove { color: #FF3B30; cursor: pointer; font-size: 1.4rem; font-weight: bold; width: 32px; text-align: center; }
         
+        /* MOVE CONTROLS */
+        .move-controls { display: flex; gap: 4px; margin-right: 8px; }
+        .move-btn { background: rgba(255, 255, 255, 0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
+        .move-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .move-btn:disabled { opacity: 0.1; cursor: not-allowed; }
+
         .modal { position: fixed; inset: 0; z-index: 1000; display: none; justify-content: center; align-items: center; padding: 16px; }
         .modal.show { display: flex; }
         .modal-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
@@ -122,12 +127,7 @@
 
         .success-icon { width: 80px; height: 80px; background: var(--gradient-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; color: white; box-shadow: 0 10px 20px rgba(52, 199, 89, 0.3); }
 
-        /* CENTERED TEXT CONTAINER */
-        .survey-header-center {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        .survey-header-center { text-align: center; margin-bottom: 30px; }
     </style>
 </head>
 <body>
@@ -164,17 +164,13 @@
 
             <div id="branchCAB">
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabRating">How would you rate your overall experience at this event?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabRating">How would you rate your overall experience?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars cab-stars">
                         <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabFirstTime">Was this your first time attending a CAB event?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabFirstTime">First time attending a CAB event?</span><span class="required-mark">*</span></label>
                     <select id="formFirstTime" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
@@ -182,27 +178,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabHear">How did you hear about this event?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabHear">How did you hear about this?</span><span class="required-mark">*</span></label>
                     <select id="formHearAbout" class="control-item"></select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabFavorite">What was your favorite part of the event?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabFavorite">Favorite part of the event?</span><span class="required-mark">*</span></label>
                     <textarea id="formFavorite" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabImprove">What would you change or improve for next time?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabImprove">What would you improve?</span><span class="required-mark">*</span></label>
                     <textarea id="formImprove" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabLikely">How likely are you to attend a CAB event again?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabLikely">Likely to attend again?</span><span class="required-mark">*</span></label>
                     <select id="formLikely" class="control-item">
                         <option value="">Select...</option>
                         <option value="Very Likely">Very Likely</option>
@@ -212,32 +200,24 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-cabStaff">Did any CAB Event Staff take the time to connect with you?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-cabStaff">Did staff connect with you?</span><span class="required-mark">*</span></label>
                     <textarea id="formStaff" class="control-item" placeholder="Type here..."></textarea>
                 </div>
             </div>
 
             <div id="branchMarket" style="display:none;">
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-mktRating">How would you rate your experience at the Student Market?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-mktRating">Rate your Market experience?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars mkt-stars">
                         <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-mktFavorite">What did you enjoy most about this market?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-mktFavorite">Most enjoyed part?</span><span class="required-mark">*</span></label>
                     <textarea id="mktFavorite" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-mktFirstTime">Was this your first time attending a CAB Student Market?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-mktFirstTime">First time at the Market?</span><span class="required-mark">*</span></label>
                     <select id="mktFirstTime" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
@@ -245,9 +225,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-mktVariety">How satisfied were you with the variety of vendors?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-mktVariety">Satisfied with variety?</span><span class="required-mark">*</span></label>
                     <select id="mktVariety" class="control-item">
                         <option value="">Select...</option>
                         <option value="Very Satisfied">Very Satisfied</option>
@@ -257,9 +235,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">
-                        <span id="label-mktPurchase">Did you make a purchase at the market?</span><span class="required-mark">*</span>
-                    </label>
+                    <label class="form-label"><span id="label-mktPurchase">Did you buy something?</span><span class="required-mark">*</span></label>
                     <select id="mktPurchase" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
@@ -269,7 +245,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" id="label-comments">Any additional comments or suggestions? (Optional)</label>
+                <label class="form-label" id="label-comments">Additional comments? (Optional)</label>
                 <textarea id="formComments" class="control-item" placeholder="Type here..."></textarea>
             </div>
 
@@ -287,7 +263,6 @@
             <div class="success-icon">✓</div>
             <h2 style="margin-top:0">Thank You!</h2>
             <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 32px;">Your feedback has been successfully submitted.</p>
-            
             <div class="center-btn-wrapper">
                 <button class="btn btn-primary" onclick="resetFormAndReturn()">Submit Another Response</button>
             </div>
@@ -307,7 +282,7 @@
             <div class="settings-grid">
                 <div>
                     <div class="settings-section">
-                        <div class="settings-title">Event Management</div>
+                        <div class="settings-title">Event Management (Reorder & Market Toggle)</div>
                         <div id="event-list-manager" class="list-manager"></div>
                         <div style="display:flex; gap:8px; margin-top:16px;">
                             <input type="text" id="newEventName" class="control-item" placeholder="Event Name..." />
@@ -485,7 +460,27 @@
 
     function renderEventSettings() {
         const box = document.getElementById('event-list-manager');
-        box.innerHTML = state.tempEvents.map((ev, idx) => `<div class="list-row"><span class="list-name">${ev.name}</span><label class="market-toggle" style="font-size: 0.75rem; color: var(--text-muted);"><input type="checkbox" ${ev.isMarket ? 'checked' : ''} onchange="toggleMarketFlag(${idx}, this.checked)"> Market</label><div class="list-remove" onclick="removeEventUI(${idx})">&times;</div></div>`).join('');
+        box.innerHTML = state.tempEvents.map((ev, idx) => `
+            <div class="list-row">
+                <div class="move-controls">
+                    <button class="move-btn" onclick="moveEvent(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                    <button class="move-btn" onclick="moveEvent(${idx}, 1)" ${idx === state.tempEvents.length - 1 ? 'disabled' : ''}>↓</button>
+                </div>
+                <span class="list-name">${ev.name}</span>
+                <label class="market-toggle" style="font-size: 0.75rem; color: var(--text-muted);">
+                    <input type="checkbox" ${ev.isMarket ? 'checked' : ''} onchange="toggleMarketFlag(${idx}, this.checked)"> Market
+                </label>
+                <div class="list-remove" onclick="removeEventUI(${idx})">&times;</div>
+            </div>
+        `).join('');
+    }
+
+    function moveEvent(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= state.tempEvents.length) return;
+        const element = state.tempEvents.splice(index, 1)[0];
+        state.tempEvents.splice(newIndex, 0, element);
+        renderEventSettings();
     }
 
     function toggleMarketFlag(idx, val) { state.tempEvents[idx].isMarket = val; }
@@ -515,20 +510,15 @@
         checkEventType();
     }
 
-    // TRIGGER CONFETTI
     function fireConfetti() {
         const duration = 3 * 1000;
         const animationEnd = Date.now() + duration;
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
         function randomInRange(min, max) { return Math.random() * (max - min) + min; }
-
         const interval = setInterval(function() {
             const timeLeft = animationEnd - Date.now();
             if (timeLeft <= 0) return clearInterval(interval);
-
             const particleCount = 50 * (timeLeft / duration);
-            // School Colors: Blue and Purple
             confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#0A84FF', '#BF5AF2'] }));
             confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#0A84FF', '#BF5AF2'] }));
         }, 250);
@@ -538,13 +528,8 @@
         const studentID = document.getElementById('formStudentID').value;
         const event = document.getElementById('formEvent').value;
         const rating = state.currentRating;
-
-        if (!studentID || !event || rating === 0) {
-            return showToast("Please provide ID, Event, and Rating.", true);
-        }
-
+        if (!studentID || !event || rating === 0) return showToast("Please provide ID, Event, and Rating.", true);
         let data = { studentID, event, rating, comments: document.getElementById('formComments').value, isMarket: state.isMarket };
-
         if (state.isMarket) {
             const favorite = document.getElementById('mktFavorite').value;
             const firstTime = document.getElementById('mktFirstTime').value;
@@ -562,9 +547,8 @@
             if (!firstTime || !hearAbout || !favorite || !improve || !likely || !staff) return showToast("Please answer all required questions.", true);
             data = { ...data, firstTime, hearAbout, favoritePart: favorite, improve, likelyToReturn: likely, staffConnect: staff };
         }
-
         switchView('success');
-        fireConfetti(); // FIRE CONFETTI ON SUCCESS
+        fireConfetti();
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }).catch(e => console.error(e));
     }
 
@@ -583,7 +567,12 @@
     }
 
     async function saveAdminSettings() {
-        const config = { Events: state.tempEvents.map(e => e.name).join(','), MarketEvents: state.tempEvents.filter(e => e.isMarket).map(e => e.name).join(','), HeaderImageURL: document.getElementById('setHeaderImg').value, SurveyDescription: document.getElementById('setDesc').value };
+        const config = { 
+            Events: state.tempEvents.map(e => e.name).join(','), 
+            MarketEvents: state.tempEvents.filter(e => e.isMarket).map(e => e.name).join(','), 
+            HeaderImageURL: document.getElementById('setHeaderImg').value, 
+            SurveyDescription: document.getElementById('setDesc').value 
+        };
         state.questionKeys.forEach(key => { config['q-' + key] = document.getElementById('q-' + key).value; });
         const newPass = document.getElementById('setNewPass').value.trim();
         const btn = document.getElementById('saveConfigBtn'); btn.disabled = true; document.getElementById('saveLoader').style.display = "block";
