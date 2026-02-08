@@ -164,13 +164,13 @@
 
             <div id="branchCAB">
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabRating">How would you rate your overall experience?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabRating">How would you rate your overall experience at this event?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars cab-stars">
                         <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabFirstTime">First time attending a CAB event?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabFirstTime">Was this your first time attending a CAB event?</span><span class="required-mark">*</span></label>
                     <select id="formFirstTime" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
@@ -178,19 +178,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabHear">How did you hear about this?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabHear">How did you hear about this event?</span><span class="required-mark">*</span></label>
                     <select id="formHearAbout" class="control-item"></select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabFavorite">Favorite part of the event?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabFavorite">What was your favorite part of the event?</span><span class="required-mark">*</span></label>
                     <textarea id="formFavorite" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabImprove">What would you improve?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabImprove">What would you change or improve for next time?</span><span class="required-mark">*</span></label>
                     <textarea id="formImprove" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabLikely">Likely to attend again?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabLikely">How likely are you to attend a CAB event again?</span><span class="required-mark">*</span></label>
                     <select id="formLikely" class="control-item">
                         <option value="">Select...</option>
                         <option value="Very Likely">Very Likely</option>
@@ -200,24 +200,25 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-cabStaff">Did staff connect with you?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-cabStaff">Did any CAB Event Staff take the time to connect with you or talk to you during the event? (If so who?)</span><span class="required-mark">*</span></label>
                     <textarea id="formStaff" class="control-item" placeholder="Type here..."></textarea>
                 </div>
             </div>
 
             <div id="branchMarket" style="display:none;">
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktRating">Rate your Market experience?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktRating">How would you rate your overall experience at the Student Market?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars mkt-stars">
                         <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktFavorite">Most enjoyed part?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktFavorite">What did you enjoy most about this market?
+</span><span class="required-mark">*</span></label>
                     <textarea id="mktFavorite" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktFirstTime">First time at the Market?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktFirstTime">Was this your first time attending a CAB Student Market?</span><span class="required-mark">*</span></label>
                     <select id="mktFirstTime" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
@@ -225,7 +226,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktVariety">Satisfied with variety?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktVariety">How satisfied were you with the variety of vendors?</span><span class="required-mark">*</span></label>
                     <select id="mktVariety" class="control-item">
                         <option value="">Select...</option>
                         <option value="Very Satisfied">Very Satisfied</option>
@@ -235,7 +236,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktPurchase">Did you buy something?</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktPurchase">Did you make a purchase at the market?</span><span class="required-mark">*</span></label>
                     <select id="mktPurchase" class="control-item">
                         <option value="">Select...</option>
                         <option value="Yes">Yes</option>
