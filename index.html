@@ -119,6 +119,43 @@
             box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15), inset 0 2px 4px rgba(0,0,0,0.1); 
         }
 
+        input[type="file"].control-item {
+            padding: 10px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+        input[type="file"].control-item::file-selector-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        input[type="file"].control-item::file-selector-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .image-preview {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .image-preview img {
+            max-width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        .image-preview:empty {
+            display: none;
+        }
+
         select.control-item { 
             appearance: none; -webkit-appearance: none; 
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); 
@@ -340,6 +377,8 @@
                     <div class="loader" id="submitLoader"></div>
                 </button>
             </div>
+            <!-- Added error display box -->
+            <div id="dbErrorBox" style="display: none; background: rgba(255, 59, 48, 0.1); border: 1px solid #FF3B30; color: #FF3B30; padding: 16px; border-radius: 12px; margin-top: 20px; font-size: 0.9rem; text-align: center; font-weight: 600;"></div>
         </div>
     </div>
 
@@ -383,13 +422,19 @@
                     <div class="settings-section">
                         <div class="settings-title">Global Branding & Design</div>
                         <div class="form-group">
-                            <label class="form-label">Background Image URL</label>
-                            <input type="text" id="setBgImg" class="control-item" placeholder="https://..." />
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">Leave blank for default dynamic mesh.</div>
+                            <label class="form-label">Background Image</label>
+                            <input type="file" id="bgImgFile" class="control-item" accept="image/*" onchange="window.handleImageUpload(event, 'setBgImg', 'bgImgPreview')" />
+                            <input type="hidden" id="setBgImg" />
+                            <div id="bgImgPreview" class="image-preview"></div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">Leave blank for default dynamic mesh. (Requires a public 'images' bucket in Supabase)</div>
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.75rem; margin-top: 8px; width: auto;" onclick="window.clearImage('setBgImg', 'bgImgPreview', 'bgImgFile')">Clear Background</button>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Cover / Banner Image URL</label>
-                            <input type="text" id="setHeaderImg" class="control-item" placeholder="https://..." />
+                            <label class="form-label">Cover / Banner Image</label>
+                            <input type="file" id="headerImgFile" class="control-item" accept="image/*" onchange="window.handleImageUpload(event, 'setHeaderImg', 'headerImgPreview')" />
+                            <input type="hidden" id="setHeaderImg" />
+                            <div id="headerImgPreview" class="image-preview"></div>
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.75rem; margin-top: 8px; width: auto;" onclick="window.clearImage('setHeaderImg', 'headerImgPreview', 'headerImgFile')">Clear Banner</button>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Survey Intro Text</label>
@@ -569,14 +614,14 @@
             if (!supabaseClient) throw new Error("Supabase client not initialized");
             const { data: querySnapshot, error } = await supabaseClient
                 .from('responses')
-                .select('*');
+                .select('data');
                 
             if (error) throw error;
             
             const overviewMap = {};
             
             (querySnapshot || []).forEach((row) => {
-                const r = normalizeResponseRecord(row);
+                const r = row.data; 
                 if (!r || !r.event) return;
                 
                 if (!overviewMap[r.event]) {
@@ -646,7 +691,11 @@
         
         // Admin Form population
         document.getElementById('setHeaderImg').value = state.config.HeaderImageURL || "";
+        document.getElementById('headerImgPreview').innerHTML = state.config.HeaderImageURL ? `<img src="${state.config.HeaderImageURL}" />` : "";
+        
         document.getElementById('setBgImg').value = state.config.BackgroundImageURL || "";
+        document.getElementById('bgImgPreview').innerHTML = state.config.BackgroundImageURL ? `<img src="${state.config.BackgroundImageURL}" />` : "";
+
         document.getElementById('setDesc').value = state.config.SurveyDescription || "";
         renderEventSettings();
     }
@@ -686,6 +735,45 @@
         document.getElementById('newEventName').value = ""; 
         renderEventSettings(); 
     }
+
+    window.handleImageUpload = async function(event, hiddenInputId, previewId) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        showToast("Uploading image...");
+        
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        try {
+            if (!supabaseClient) throw new Error("Supabase not initialized");
+            
+            const { data, error } = await supabaseClient.storage
+                .from('images')
+                .upload(filePath, file);
+
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from('images')
+                .getPublicUrl(filePath);
+
+            document.getElementById(hiddenInputId).value = publicUrl;
+            document.getElementById(previewId).innerHTML = `<img src="${publicUrl}" />`;
+            
+            showToast("Upload successful!");
+        } catch (e) {
+            console.error("Upload error:", e);
+            showToast("Upload failed! Ensure you have a public 'images' bucket in Supabase.", true);
+        }
+    };
+
+    window.clearImage = function(hiddenInputId, previewId, fileInputId) {
+        document.getElementById(hiddenInputId).value = "";
+        document.getElementById(previewId).innerHTML = "";
+        document.getElementById(fileInputId).value = "";
+    };
 
     window.checkEventType = function() {
         const selected = document.getElementById('formEvent').value;
@@ -735,72 +823,6 @@
         }, 250);
     }
 
-    function normalizeResponseRecord(row) {
-        if (!row || typeof row !== 'object') return null;
-        const raw = (row.data && typeof row.data === 'object') ? row.data : row;
-
-        const isMarket = Boolean(
-            raw.isMarket ??
-            raw.is_market ??
-            raw.market_event_name ??
-            raw.marketEventName
-        );
-
-        const event = raw.event || raw.cab_event_name || raw.market_event_name || raw.cabEventName || raw.marketEventName || "";
-        const rating = raw.rating ?? raw.cab_rating ?? raw.market_rating ?? raw.cabRating ?? raw.marketRating ?? 0;
-
-        return {
-            ...raw,
-            event,
-            rating,
-            isMarket,
-            firstTime: raw.firstTime ?? raw.cab_first_time ?? raw.cabFirstTime ?? "",
-            hearAbout: raw.hearAbout ?? raw.cab_hear_about ?? raw.cabHearAbout ?? "",
-            favoritePart: raw.favoritePart ?? raw.cab_favorite_part ?? raw.mkt_favorite_part ?? raw.market_favorite_part ?? "",
-            improve: raw.improve ?? raw.cab_improvements ?? "",
-            likelyToReturn: raw.likelyToReturn ?? raw.cab_likely_return ?? "",
-            staffConnect: raw.staffConnect ?? raw.cab_staff_connect ?? "",
-            comments: raw.comments ?? raw.cab_comments ?? raw.mkt_comments ?? raw.market_comments ?? "",
-            mktFirstTime: raw.mktFirstTime ?? raw.mkt_first_time ?? "",
-            variety: raw.variety ?? raw.mkt_variety_sat ?? "",
-            purchase: raw.purchase ?? raw.mkt_purchase_made ?? "",
-            timestamp: raw.timestamp ?? raw.created_at ?? raw.createdAt
-        };
-    }
-
-    function buildLegacyResponsePayload(data) {
-        const base = {
-            timestamp: data.timestamp,
-            student_id: data.studentID
-        };
-
-        if (data.isMarket) {
-            return {
-                ...base,
-                market_event_name: data.event,
-                market_rating: data.rating,
-                mkt_favorite_part: data.favoritePart,
-                mkt_first_time: data.mktFirstTime,
-                mkt_variety_sat: data.variety,
-                mkt_purchase_made: data.purchase,
-                mkt_comments: data.comments || ""
-            };
-        }
-
-        return {
-            ...base,
-            cab_event_name: data.event,
-            cab_rating: data.rating,
-            cab_first_time: data.firstTime,
-            cab_hear_about: data.hearAbout,
-            cab_favorite_part: data.favoritePart,
-            cab_improvements: data.improve,
-            cab_likely_return: data.likelyToReturn,
-            cab_staff_connect: data.staffConnect,
-            cab_comments: data.comments || ""
-        };
-    }
-
     window.submitSurvey = async function() {
         if (!supabaseClient) return showToast("Database not connected.", true);
 
@@ -810,7 +832,7 @@
         
         if (!studentID || !event || rating === 0) return showToast("Please provide ID, Event, and Rating.", true);
         
-        let data = { 
+        let payload = { 
             studentID, 
             event, 
             rating, 
@@ -825,7 +847,7 @@
             const variety = document.getElementById('mktVariety').value;
             const purchase = document.getElementById('mktPurchase').value;
             if (!favorite || !firstTime || !variety || !purchase) return showToast("Please answer all required questions.", true);
-            data = { ...data, favoritePart: favorite, mktFirstTime: firstTime, variety, purchase };
+            payload = { ...payload, favoritePart: favorite, mktFirstTime: firstTime, variety, purchase };
         } else {
             const firstTime = document.getElementById('formFirstTime').value;
             const hearAbout = document.getElementById('formHearAbout').value;
@@ -834,24 +856,33 @@
             const likely = document.getElementById('formLikely').value;
             const staff = document.getElementById('formStaff').value;
             if (!firstTime || !hearAbout || !favorite || !improve || !likely || !staff) return showToast("Please answer all required questions.", true);
-            data = { ...data, firstTime, hearAbout, favoritePart: favorite, improve, likelyToReturn: likely, staffConnect: staff };
+            payload = { ...payload, firstTime, hearAbout, favoritePart: favorite, improve, likelyToReturn: likely, staffConnect: staff };
         }
 
         const btn = document.getElementById('submitBtn'); 
         btn.disabled = true; 
         document.getElementById('submitLoader').style.display = "block";
+        document.getElementById('dbErrorBox').style.display = "none";
 
         try {
-            let { error } = await supabaseClient.from('responses').insert([{ data: data }]);
+            console.log("Attempting to insert into Supabase...", payload);
+            
+            // CRITICAL FIX: Adding .select() forces Supabase to confirm the row was saved.
+            const { data: insertedData, error } = await supabaseClient.from('responses').insert([{ data: payload }]).select();
+            
+            console.log("Supabase Insert Result:", { insertedData, error });
+            
             if (error) {
-                const fallbackFlat = await supabaseClient.from('responses').insert([data]);
-                error = fallbackFlat.error;
+                document.getElementById('dbErrorBox').innerHTML = "SUPABASE ERROR: " + error.message;
+                document.getElementById('dbErrorBox').style.display = "block";
+                throw error;
             }
-            if (error) {
-                const fallbackLegacy = await supabaseClient.from('responses').insert([buildLegacyResponsePayload(data)]);
-                error = fallbackLegacy.error;
+
+            if (!insertedData || insertedData.length === 0) {
+                document.getElementById('dbErrorBox').innerHTML = "SUPABASE RLS ERROR: Supabase silently blocked the save. You need to enable the INSERT policy for the responses table!";
+                document.getElementById('dbErrorBox').style.display = "block";
+                throw new Error("RLS Blocked Insert");
             }
-            if (error) throw error;
             
             window.switchView('success');
             fireConfetti();
@@ -859,17 +890,30 @@
             // Background Henry AI Process
             (async () => {
                 try {
+                    console.log("--- STARTING BACKGROUND AI PROCESS ---");
                     const { data: secretDoc } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
                     const openRouterKey = secretDoc?.data?.openRouterKey;
-                    if (!openRouterKey) return; 
 
-                    const { data: allResponses } = await supabaseClient.from('responses').select('*');
+                    console.log("Fetching all responses to calculate average...");
+                    const { data: allResponses, error: fetchError } = await supabaseClient.from('responses').select('data');
+                    
+                    if (fetchError) console.warn("Notice: Database read blocked by RLS. Proceeding with current submission only.", fetchError);
                     
                     let count = 0; let sumRating = 0; let feedbackText = "";
 
-                    (allResponses || []).forEach(row => {
-                        const r = normalizeResponseRecord(row);
-                        if (r && r.event === event) { 
+                    // Safely parse whatever the database allowed us to read
+                    let parsedResponses = (allResponses || []).map(row => typeof row.data === 'string' ? JSON.parse(row.data) : row.data);
+                    
+                    // CRITICAL FIX: Force inject the current submission into the math 
+                    // just in case Supabase RLS blocked the read query!
+                    const alreadyIncluded = parsedResponses.some(r => r && r.timestamp === payload.timestamp);
+                    if (!alreadyIncluded) {
+                        console.log("Injecting current submission into AI calculation...");
+                        parsedResponses.push(payload);
+                    }
+
+                    parsedResponses.forEach(r => {
+                        if (r && String(r.event).trim() === String(event).trim()) { 
                             count++; sumRating += Number(r.rating) || 0;
                             if (!r.isMarket) {
                                 feedbackText += `Rating: ${r.rating}. Favorite: ${r.favoritePart}. Improve: ${r.improve}. Comments: ${r.comments}\n`;
@@ -879,24 +923,47 @@
                         }
                     });
 
+                    console.log(`Compiled ${count} responses for ${event}. Average Rating: ${(sumRating/count).toFixed(1)}`);
+
                     if (count > 0) {
                         const avgRating = (sumRating / count).toFixed(1);
-                        const newSummary = await callOpenRouter(openRouterKey, feedbackText);
+                        let newSummary = "Waiting for AI generation. Click 'Generate AI Summaries' in Admin console.";
                         
-                        await supabaseClient.from('event_overviews').upsert({
+                        // Only try to call the AI if the key actually exists
+                        if (openRouterKey && openRouterKey.trim() !== "") {
+                            console.log("Calling OpenRouter AI...");
+                            newSummary = await callOpenRouter(openRouterKey, feedbackText);
+                            console.log("AI Summary Result:", newSummary);
+                        } else {
+                            console.log("No OpenRouter Key found. Skipping AI generation.");
+                        }
+                        
+                        console.log("Saving to event_overviews...");
+                        const { data: upsertData, error: upsertError } = await supabaseClient.from('event_overviews').upsert({
                             eventname: event, summary: newSummary, rating: Number(avgRating), surveys: count, last_updated: new Date().toISOString()
-                        });
+                        }).select();
+
+                        console.log("Event Overviews Upsert Result:", { upsertData, upsertError });
+
+                        if (upsertError) {
+                            alert("SUPABASE EVENT_OVERVIEWS ERROR: " + upsertError.message);
+                        } else if (!upsertData || upsertData.length === 0) {
+                            alert("SUPABASE RLS ERROR: The AI summary was blocked from saving because the 'event_overviews' table needs its INSERT/UPDATE policy enabled in Supabase.");
+                        } else {
+                            console.log("Successfully updated event_overviews!");
+                        }
                         
                         window.fetchDashboardData();
                     }
                 } catch (backgroundError) {
-                    console.error("Background AI generation failed:", backgroundError);
+                    console.error("Background data compilation failed:", backgroundError);
+                    alert("BACKGROUND AI PROCESS FAILED: " + backgroundError.message);
                 }
             })();
 
         } catch(e) {
-            console.error(e);
-            showToast(`Error submitting survey: ${e.message || 'Unknown error'}`, true);
+            console.error("Survey submission failed:", e);
+            showToast("Failed to submit. See error message below button.", true);
         } finally {
             btn.disabled = false;
             document.getElementById('submitLoader').style.display = "none";
@@ -1006,7 +1073,7 @@
 
             showToast("Gathering responses...");
 
-            const { data: responses } = await supabaseClient.from('responses').select('*');
+            const { data: responses } = await supabaseClient.from('responses').select('data, created_at');
             const { data: overviews } = await supabaseClient.from('event_overviews').select('*');
 
             const overviewMap = {};
@@ -1014,7 +1081,7 @@
 
             const eventData = {};
             (responses || []).forEach(row => {
-                const r = normalizeResponseRecord(row);
+                const r = row.data;
                 if (!r || !r.event) return;
                 
                 const eventName = r.event;
