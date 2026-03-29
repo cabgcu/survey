@@ -15,13 +15,13 @@
             --gradient-accent: linear-gradient(135deg, #0A84FF, #BF5AF2);
             --gradient-fire: linear-gradient(135deg, #FF9500, #FF3B30);
             --gradient-success: linear-gradient(135deg, #34C759, #30B0C7);
-            
+
             /* Glassmorphism Variables */
-            --glass-bg: rgba(20, 20, 25, 0.35); 
+            --glass-bg: rgba(20, 20, 25, 0.35);
             --glass-border: rgba(255, 255, 255, 0.15);
             --glass-highlight: rgba(255, 255, 255, 0.1);
             --blur-card: 45px;
-            
+
             --radius-card: 24px;
             --radius-input: 14px;
             --radius-btn: 14px;
@@ -29,13 +29,13 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            overflow-x: hidden; 
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
             background-color: #09090b;
         }
 
@@ -52,8 +52,8 @@
         }
         /* Default fallback gradient if no custom image is set */
         .default-mesh {
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(10, 132, 255, 0.3) 0%, transparent 50%), 
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(10, 132, 255, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 85% 30%, rgba(191, 90, 242, 0.3) 0%, transparent 50%);
             filter: blur(40px);
         }
@@ -65,29 +65,29 @@
 
         .view { display: none; opacity: 0; transform: translateY(15px); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .view.active { display: block; opacity: 1; transform: translateY(0); animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
+
         /* Premium Frosted Glass Panel */
-        .glass-panel { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(var(--blur-card)) saturate(180%); 
-            -webkit-backdrop-filter: blur(var(--blur-card)) saturate(180%); 
-            border: 1px solid var(--glass-border); 
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-card)) saturate(180%);
+            -webkit-backdrop-filter: blur(var(--blur-card)) saturate(180%);
+            border: 1px solid var(--glass-border);
             border-top: 1px solid rgba(255, 255, 255, 0.35); /* Crisp top edge light */
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 var(--glass-highlight); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 var(--glass-highlight);
             border-radius: var(--radius-card);
         }
 
         /* Banner styling */
-        .hero-banner { 
-            width: 100%; max-width: var(--max-width-content); margin: 0 auto 32px; 
-            border-radius: 20px; overflow: hidden; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
-            line-height: 0; 
+        .hero-banner {
+            width: 100%; max-width: var(--max-width-content); margin: 0 auto 32px;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            line-height: 0;
             border: 1px solid var(--glass-border);
             display: none; /* Hidden by default until loaded */
         }
         .hero-banner img { width: 100%; height: auto; display: block; object-fit: cover; max-height: 250px; }
-        
+
         .survey-card { width: 100%; max-width: var(--max-width-content); margin: 0 auto 40px; padding: 32px 24px; }
         @media (min-width: 768px) { .survey-card { padding: 48px; } }
 
@@ -99,78 +99,41 @@
         .form-group { margin-bottom: 32px; }
         .form-label { display: block; margin-bottom: 10px; color: #e4e4e7; font-size: 0.9rem; font-weight: 600; line-height: 1.4; }
         .required-mark { color: #FF453A; margin-left: 4px; font-weight: bold; }
-        
-        input.control-item, select.control-item, textarea.control-item { 
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.06); 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            color: #fff; padding: 16px 20px; 
-            border-radius: var(--radius-input); 
-            font-family: inherit; font-size: 1rem; 
-            outline: none; transition: all 0.2s ease; 
+
+        input.control-item, select.control-item, textarea.control-item {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff; padding: 16px 20px;
+            border-radius: var(--radius-input);
+            font-family: inherit; font-size: 1rem;
+            outline: none; transition: all 0.2s ease;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
             backdrop-filter: blur(20px) saturate(150%);
             -webkit-backdrop-filter: blur(20px) saturate(150%);
         }
         .control-item::placeholder { color: #71717a; }
-        .control-item:focus { 
-            border-color: #0A84FF; 
-            background: rgba(0, 0, 0, 0.4); 
-            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15), inset 0 2px 4px rgba(0,0,0,0.1); 
+        .control-item:focus {
+            border-color: #0A84FF;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15), inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        input[type="file"].control-item {
-            padding: 10px;
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-        }
-        input[type="file"].control-item::file-selector-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            margin-right: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        input[type="file"].control-item::file-selector-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .image-preview {
-            margin-top: 12px;
-            border-radius: 12px;
-            overflow: hidden;
-            display: inline-block;
-        }
-        .image-preview img {
-            max-width: 100%;
-            height: 120px;
-            object-fit: cover;
-            display: block;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-        }
-        .image-preview:empty {
-            display: none;
-        }
-
-        select.control-item { 
-            appearance: none; -webkit-appearance: none; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); 
-            background-repeat: no-repeat; background-position: right 20px center; 
-            padding-right: 48px; 
+        select.control-item {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 20px center;
+            padding-right: 48px;
             cursor: pointer;
         }
         textarea.control-item { min-height: 120px; resize: vertical; line-height: 1.5; }
-        
+
         /* Star Rating */
         .rating-stars { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
         .star { font-size: 2.5rem; cursor: pointer; color: rgba(255,255,255,0.1); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .star:hover { transform: scale(1.1); }
         .star.selected { color: #FFD60A; filter: drop-shadow(0 4px 12px rgba(255,214,10,0.4)); transform: scale(1.05); }
-        
+
         /* Dashboard & Cards */
         #dashboard { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 60px; }
         @media (min-width: 768px) { #dashboard { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 32px; } }
@@ -180,46 +143,32 @@
         .card-header { position: relative; height: 180px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); }
         .card-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
         .card-body { padding: 28px; flex: 1; display: flex; flex-direction: column; }
-        
+
         /* Buttons */
-        .btn { 
-            padding: 16px 28px; border-radius: var(--radius-btn); 
-            font-weight: 600; cursor: pointer; border: none; 
-            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; 
+        .btn {
+            padding: 16px 28px; border-radius: var(--radius-btn);
+            font-weight: 600; cursor: pointer; border: none;
+            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
             font-size: 1rem; width: 100%; letter-spacing: 0.02em;
         }
         @media (min-width: 768px) { .btn { width: auto; } }
         .btn:active { transform: scale(0.97); }
 
-        .btn-primary { 
-            background: var(--gradient-accent); color: white; 
-            box-shadow: 0 8px 16px rgba(10, 132, 255, 0.25); 
+        .btn-primary {
+            background: var(--gradient-accent); color: white;
+            box-shadow: 0 8px 16px rgba(10, 132, 255, 0.25);
             border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-primary:hover { box-shadow: 0 12px 24px rgba(10, 132, 255, 0.4); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-ghost { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             color: #e4e4e7; backdrop-filter: blur(10px);
         }
         .btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
         .badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; background: rgba(255,255,255,0.1); margin-right: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        
-        /* List Manager in Settings */
-        .list-manager { margin-top: 10px; max-height: 280px; overflow-y: auto; padding-right: 8px; }
-        .list-manager::-webkit-scrollbar { width: 6px; }
-        .list-manager::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        .list-row { display: flex; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); gap: 12px; }
-        .list-name { flex: 1; font-size: 0.95rem; font-weight: 500; }
-        .list-remove { color: #FF453A; cursor: pointer; font-size: 1.4rem; font-weight: bold; width: 32px; text-align: center; opacity: 0.7; transition: 0.2s; }
-        .list-remove:hover { opacity: 1; }
-        
-        .move-controls { display: flex; gap: 4px; margin-right: 8px; }
-        .move-btn { background: rgba(255, 255, 255, 0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
-        .move-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
-        .move-btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
         /* Modals & Toasts */
         .modal { position: fixed; inset: 0; z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
@@ -227,33 +176,21 @@
         .modal-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .modal-content { position: relative; width: 100%; max-width: 420px; padding: 40px 32px; text-align: center; }
         .modal-content h3 { font-size: 1.5rem; margin-bottom: 8px; }
-        
+
         .loader { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-bottom-color: #fff; border-radius: 50%; animation: rotation 0.8s linear infinite; margin-left: 10px; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: auto; min-width: 250px; max-width: 90%; padding: 16px 32px; border-radius: 100px; background: rgba(20,20,25,0.9); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); color: white; font-weight: 600; z-index: 2000; display: none; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        
-        /* Settings View Layout */
-        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 992px) { .settings-grid { grid-template-columns: 1fr 1fr; gap: 60px; } }
-        .settings-section { margin-bottom: 40px; } 
-        .settings-title { color: var(--text-main); font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
 
         footer { margin-top: auto; padding: 60px 0 40px; text-align: center; color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; }
-        
-        .center-btn-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 24px; }
+
         .success-icon { width: 90px; height: 90px; background: var(--gradient-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px; font-size: 40px; color: white; box-shadow: 0 16px 32px rgba(52, 199, 89, 0.3); }
-        
-        /* Custom Checkbox */
-        .market-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; }
-        .market-toggle input[type="checkbox"] { accent-color: #0A84FF; width: 16px; height: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="bg-wrapper">
-    <!-- The #bg-custom element receives the user's uploaded/linked background image -->
     <div id="bg-custom" class="default-mesh"></div>
 </div>
 
@@ -371,13 +308,12 @@
                 <textarea id="formComments" class="control-item" placeholder="Anything else you'd like to share?"></textarea>
             </div>
 
-            <div class="center-btn-wrapper">
+            <div style="display:flex; justify-content:center;">
                 <button class="btn btn-primary" id="submitBtn" onclick="window.submitSurvey()">
                     <span>Submit Feedback</span>
                     <div class="loader" id="submitLoader"></div>
                 </button>
             </div>
-            <!-- Added error display box -->
             <div id="dbErrorBox" style="display: none; background: rgba(255, 59, 48, 0.1); border: 1px solid #FF3B30; color: #FF3B30; padding: 16px; border-radius: 12px; margin-top: 20px; font-size: 0.9rem; text-align: center; font-weight: 600;"></div>
         </div>
     </div>
@@ -387,20 +323,10 @@
             <div class="success-icon">✓</div>
             <h2 style="margin-top:0; font-size: 2.5rem; letter-spacing: -0.02em;">Thank You!</h2>
             <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; font-size: 1.1rem;">Your feedback has been successfully submitted and helps us improve future events.</p>
-            <div class="center-btn-wrapper">
+            <div style="display:flex; justify-content:center;">
                 <button class="btn btn-primary" onclick="window.resetFormAndReturn()">Submit Another Response</button>
             </div>
         </div>
-    </div>
-
-    <div id="dashboardView" class="view">
-        <div style="margin-bottom: 40px; display:flex; flex-direction: column; gap: 16px;">
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button onclick="window.fetchDashboardData()" class="btn btn-primary" style="flex: 1; min-width: 140px;">🔄 Refresh Data</button>
-                <button onclick="window.switchView('survey')" class="btn btn-ghost" style="flex: 1; min-width: 140px;">Exit to Survey</button>
-            </div>
-        </div>
-        <div id="dashboard"></div>
     </div>
 
     <footer>
@@ -408,39 +334,47 @@
     </footer>
 </div>
 
+<div id="gateModal" class="modal">
+    <div class="modal-bg" onclick="window.hideGate()"></div>
+    <div class="glass-panel modal-content">
+        <h3>Admin Authorization</h3>
+        <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:24px;">Enter board password to continue.</p>
+        <input type="password" id="adminPass" class="control-item no-save-pass" placeholder="Password" style="margin-bottom:24px; text-align: center;" autocomplete="off" spellcheck="false" onkeyup="if(event.key==='Enter') window.verifyAdmin()"/>
+        <button class="btn btn-primary" id="gateBtn" onclick="window.verifyAdmin()">
+            <span>Authorize & Login</span>
+            <div class="loader" id="gateLoader"></div>
+        </button>
+    </div>
+</div>
+
 <div id="toast">Notification Placeholder</div>
 
 <script>
-    // Supabase Configuration
     const SUPABASE_URL = 'https://hpkhhtzbhkjkdfprsmnt.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_--X_qzfO-yz_IPK1IN-sug_l83Dwmn2'; 
-    
-    // Initialize Supabase Client safely to avoid global variable conflicts
+    const SUPABASE_ANON_KEY = 'sb_publishable_--X_qzfO-yz_IPK1IN-sug_l83Dwmn2';
+
     let supabaseClient = null;
     if (window.supabase) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } else {
-        console.error("Supabase failed to load. Check ad blockers or network connection.");
+        console.error("Supabase failed to load. Check network connection.");
     }
 
-    let state = { 
-        responses: [], 
-        config: {}, 
-        currentRating: 0, 
-        view: 'survey', 
-        isAdmin: false, 
-        isMarket: false, 
+    let state = {
+        responses: [],
+        config: {},
+        currentRating: 0,
+        view: 'survey',
+        isMarket: false,
         tempEvents: [],
         questionKeys: [
-            'studentID', 'eventSelect', 'cabRating', 'cabFirstTime', 'cabHear', 'cabFavorite', 'cabImprove', 'cabLikely', 'cabStaff', 
+            'studentID', 'eventSelect', 'cabRating', 'cabFirstTime', 'cabHear', 'cabFavorite', 'cabImprove', 'cabLikely', 'cabStaff',
             'mktRating', 'mktFavorite', 'mktFirstTime', 'mktVariety', 'mktPurchase', 'comments'
         ]
     };
 
-    // Start App robustly
     function initApp() {
         syncData();
-        switchView('survey');
     }
 
     if (document.readyState === 'loading') {
@@ -449,31 +383,14 @@
         initApp();
     }
 
-    window.switchView = function(viewName) {
-        state.view = viewName;
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        const target = document.getElementById(viewName + 'View');
-        if (target) target.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        if (viewName === 'dashboard') {
-            window.fetchDashboardData();
-        }
-    }
-
     async function syncData() {
         try {
             if (!supabaseClient) throw new Error("Supabase client not initialized");
-            const { data: configDoc, error } = await supabaseClient
-                .from('config')
-                .select('data')
-                .eq('id', 'global')
-                .maybeSingle();
-            
+            const { data: configDoc } = await supabaseClient.from('config').select('data').eq('id', 'global').maybeSingle();
+
             if (configDoc && configDoc.data) {
                 state.config = configDoc.data;
             } else {
-                // Initialize default config if database is empty
                 state.config = {
                     Events: "Welcome Week,Spring Fest,Student Market",
                     MarketEvents: "Student Market",
@@ -481,73 +398,20 @@
                     BackgroundImageURL: "",
                     SurveyDescription: "You're the reason we're here. Take 60 seconds to share your thoughts and help us plan the rest of the year!"
                 };
-                
                 await supabaseClient.from('config').insert([{ id: 'global', data: state.config }]);
-                
-                // Setup default password
-                const { data: secretCheck } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
-                if (!secretCheck) {
-                    await supabaseClient.from('config').insert([{ id: 'secrets', data: { adminPass: "admin123" } }]);
-                }
             }
 
             const all = (state.config.Events || "").split(',').map(s => s.trim()).filter(Boolean);
             const mkt = (state.config.MarketEvents || "").split(',').map(s => s.trim()).filter(Boolean);
             state.tempEvents = all.map(name => ({ name, isMarket: mkt.includes(name) }));
-            
+
             applyConfig();
-        } catch (e) { 
-            console.error("Sync error", e); 
-        }
-    }
-
-    window.fetchDashboardData = async function() {
-        try {
-            if (!supabaseClient) throw new Error("Supabase client not initialized");
-            const { data: querySnapshot, error } = await supabaseClient
-                .from('responses')
-                .select('data');
-                
-            if (error) throw error;
-            
-            const overviewMap = {};
-            
-            (querySnapshot || []).forEach((row) => {
-                const r = row.data; 
-                if (!r || !r.event) return;
-                
-                if (!overviewMap[r.event]) {
-                    overviewMap[r.event] = { eventname: r.event, surveys: 0, totalRating: 0, attendance: "Live Data", hostingteam: "CAB Team", summary: "Aggregated successfully from database.", isMarket: r.isMarket };
-                }
-                overviewMap[r.event].surveys += 1;
-                overviewMap[r.event].totalRating += Number(r.rating) || 0;
-            });
-
-            // Fetch Henry AI Summaries
-            const { data: overviews } = await supabaseClient.from('event_overviews').select('*');
-            if (overviews) {
-                overviews.forEach(ov => {
-                    if (overviewMap[ov.eventname]) {
-                        overviewMap[ov.eventname].summary = ov.summary;
-                        overviewMap[ov.eventname].attendance = ov.attendance;
-                        overviewMap[ov.eventname].hostingteam = ov.hostingteam;
-                    }
-                });
-            }
-
-            state.responses = Object.values(overviewMap).map(o => ({
-                ...o,
-                rating: (o.totalRating / o.surveys).toFixed(1)
-            }));
-            
-            renderDashboard();
-        } catch(e) {
-            console.error("Dashboard error", e);
+        } catch (e) {
+            console.error("Sync error", e);
         }
     }
 
     function applyConfig() {
-        // Apply Cover/Banner Image
         const bannerContainer = document.getElementById('bannerContainer');
         const bannerImg = document.getElementById('bannerImg');
         if (state.config.HeaderImageURL && state.config.HeaderImageURL.trim() !== '') {
@@ -557,7 +421,6 @@
             bannerContainer.style.display = 'none';
         }
 
-        // Apply Custom Background Image
         const bgCustom = document.getElementById('bg-custom');
         if (state.config.BackgroundImageURL && state.config.BackgroundImageURL.trim() !== '') {
             bgCustom.style.backgroundImage = `url('${state.config.BackgroundImageURL}')`;
@@ -568,13 +431,11 @@
         }
 
         if (state.config.SurveyDescription) document.getElementById('surveyDesc').textContent = state.config.SurveyDescription;
-        
+
         state.questionKeys.forEach(key => {
             const labelEl = document.getElementById('label-' + key);
-            const inputEl = document.getElementById('q-' + key);
             const val = state.config['q-' + key];
             if (val && labelEl) labelEl.textContent = val;
-            if (inputEl) inputEl.value = val || (labelEl ? labelEl.textContent : "");
         });
 
         document.getElementById('formEvent').innerHTML = '<option value="">Select an event...</option>' + state.tempEvents.map(e => `<option value="${e.name}">${e.name}</option>`).join('');
@@ -582,77 +443,30 @@
         document.getElementById('formHearAbout').innerHTML = '<option value="">Select an option...</option>' + hear.map(h => `<option value="${h.trim()}">${h.trim()}</option>`).join('');
     }
 
-
-    window.handleImageUpload = async function(event, hiddenInputId, previewId) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        showToast("Uploading image...");
-        
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-        const filePath = `${fileName}`;
-
-        try {
-            if (!supabaseClient) throw new Error("Supabase not initialized");
-            
-            const { data, error } = await supabaseClient.storage
-                .from('images')
-                .upload(filePath, file);
-
-            if (error) throw error;
-
-            const { data: { publicUrl } } = supabaseClient.storage
-                .from('images')
-                .getPublicUrl(filePath);
-
-            document.getElementById(hiddenInputId).value = publicUrl;
-            document.getElementById(previewId).innerHTML = `<img src="${publicUrl}" />`;
-            
-            showToast("Upload successful!");
-        } catch (e) {
-            console.error("Upload error:", e);
-            showToast("Upload failed! Ensure you have a public 'images' bucket in Supabase.", true);
-        }
-    };
-
-    window.clearImage = function(hiddenInputId, previewId, fileInputId) {
-        document.getElementById(hiddenInputId).value = "";
-        document.getElementById(previewId).innerHTML = "";
-        document.getElementById(fileInputId).value = "";
-    };
-
     window.checkEventType = function() {
         const selected = document.getElementById('formEvent').value;
         const evData = state.tempEvents.find(e => e.name === selected);
         state.isMarket = evData ? evData.isMarket : false;
-        
+
         document.getElementById('branchCAB').style.display = state.isMarket ? 'none' : 'block';
         document.getElementById('branchMarket').style.display = state.isMarket ? 'block' : 'none';
-        
-        const qTitle = state.isMarket ? (state.config['q-eventSelect'] || "Which Student Market Would You Like To Survey?") : (state.config['q-eventSelect'] || "Which Event Would You Like To Survey?");
-        const selectionLabel = document.getElementById('label-eventSelect');
-        if (selectionLabel) selectionLabel.textContent = qTitle;
-        
-        state.currentRating = 0; 
+
+        state.currentRating = 0;
         document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
     }
 
-    window.setRating = function(val) { 
-        state.currentRating = val; 
-        const stars = state.isMarket ? document.querySelectorAll('.mkt-stars .star') : document.querySelectorAll('.cab-stars .star'); 
-        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected')); 
-        stars.forEach((s, i) => { if(i < val) s.classList.add('selected'); }); 
+    window.setRating = function(val) {
+        state.currentRating = val;
+        const stars = state.isMarket ? document.querySelectorAll('.mkt-stars .star') : document.querySelectorAll('.cab-stars .star');
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+        stars.forEach((s, i) => { if(i < val) s.classList.add('selected'); });
     }
 
     window.resetFormAndReturn = function() {
         state.currentRating = 0; state.isMarket = false;
         const formFields = ['formStudentID', 'formEvent', 'formFirstTime', 'formHearAbout', 'formFavorite', 'formImprove', 'formLikely', 'formStaff', 'mktFavorite', 'mktFirstTime', 'mktVariety', 'mktPurchase', 'formComments'];
-        formFields.forEach(f => {
-            if(document.getElementById(f)) document.getElementById(f).value = "";
-        });
+        formFields.forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = ""; });
         document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
-        window.switchView('survey');
         window.checkEventType();
     }
 
@@ -676,18 +490,18 @@
         const studentID = document.getElementById('formStudentID').value;
         const event = document.getElementById('formEvent').value;
         const rating = state.currentRating;
-        
+
         if (!studentID || !event || rating === 0) return showToast("Please provide ID, Event, and Rating.", true);
-        
-        let payload = { 
-            studentID, 
-            event, 
-            rating, 
-            comments: document.getElementById('formComments').value, 
+
+        let payload = {
+            studentID,
+            event,
+            rating,
+            comments: document.getElementById('formComments').value,
             isMarket: state.isMarket,
             timestamp: new Date().toISOString()
         };
-        
+
         if (state.isMarket) {
             const favorite = document.getElementById('mktFavorite').value;
             const firstTime = document.getElementById('mktFirstTime').value;
@@ -706,19 +520,14 @@
             payload = { ...payload, firstTime, hearAbout, favoritePart: favorite, improve, likelyToReturn: likely, staffConnect: staff };
         }
 
-        const btn = document.getElementById('submitBtn'); 
-        btn.disabled = true; 
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
         document.getElementById('submitLoader').style.display = "block";
         document.getElementById('dbErrorBox').style.display = "none";
 
         try {
-            console.log("Attempting to insert into Supabase...", payload);
-            
-            // CRITICAL FIX: Adding .select() forces Supabase to confirm the row was saved.
             const { data: insertedData, error } = await supabaseClient.from('responses').insert([{ data: payload }]).select();
-            
-            console.log("Supabase Insert Result:", { insertedData, error });
-            
+
             if (error) {
                 document.getElementById('dbErrorBox').innerHTML = "SUPABASE ERROR: " + error.message;
                 document.getElementById('dbErrorBox').style.display = "block";
@@ -726,16 +535,16 @@
             }
 
             if (!insertedData || insertedData.length === 0) {
-                document.getElementById('dbErrorBox').innerHTML = "SUPABASE RLS ERROR: Supabase silently blocked the save. You need to enable the INSERT policy for the responses table!";
+                document.getElementById('dbErrorBox').innerHTML = "SUPABASE RLS ERROR: Supabase silently blocked the save. Enable INSERT policy for responses table!";
                 document.getElementById('dbErrorBox').style.display = "block";
                 throw new Error("RLS Blocked Insert");
             }
-            
-            window.switchView('success');
+
+            document.getElementById('surveyView').classList.remove('active');
+            document.getElementById('successView').classList.add('active');
             fireConfetti();
 
         } catch(e) {
-            console.error("Survey submission failed:", e);
             showToast("Failed to submit. See error message below button.", true);
         } finally {
             btn.disabled = false;
@@ -743,57 +552,19 @@
         }
     }
 
-
-
-
-    function renderDashboard() {
-        const dash = document.getElementById('dashboard'); 
-        dash.innerHTML = "";
-        
-        if (state.responses.length === 0) {
-            dash.innerHTML = "<p style='color: var(--text-muted);'>No responses recorded yet.</p>";
-            return;
-        }
-
-        state.responses.forEach(g => {
-            const card = document.createElement('div'); card.className = "glass-panel card";
-            const imgId = Math.abs((g.eventname||"").split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % 1000;
-            const img = `https://picsum.photos/seed/${imgId}/600/400`;
-            card.innerHTML = `
-                <div class="card-header"><img src="${img}" class="card-img"></div>
-                <div class="card-body">
-                    <h3 style="margin:0 0 12px 0; font-size: 1.4rem; letter-spacing:-0.02em;">${g.eventname}</h3>
-                    <div style="margin-bottom:16px">
-                        <span class="badge" style="background:var(--gradient-accent); border:none; box-shadow: 0 4px 10px rgba(10, 132, 255, 0.3);">★ ${g.rating}</span>
-                        <span class="badge">${g.surveys} Surveys</span>
-                    </div>
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:15px; display:flex; flex-wrap:wrap; gap:12px;">
-                        <span>👥 ${g.attendance}</span>
-                        <span>🏷️ ${g.hostingteam}</span>
-                    </div>
-                    <p style="font-size:0.95rem; color:#d4d4d8; line-height:1.6; margin-top: auto;">${g.summary}</p>
-                </div>`;
-            dash.appendChild(card);
-        });
-    }
-
-    function showToast(msg, isError = false) { 
-        const t = document.getElementById('toast'); 
-        t.textContent = msg; 
-        
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
         if (isError) {
             t.style.background = 'rgba(255, 59, 48, 0.9)';
             t.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-            t.style.boxShadow = '0 10px 30px rgba(255, 59, 48, 0.4)';
         } else {
             t.style.background = 'rgba(24, 24, 27, 0.9)';
             t.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-            t.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.5)';
         }
-
-        t.style.display = 'block'; 
+        t.style.display = 'block';
         t.style.animation = 'fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
-        setTimeout(() => t.style.display = 'none', 3500); 
+        setTimeout(() => t.style.display = 'none', 3500);
     }
 </script>
 </body>
