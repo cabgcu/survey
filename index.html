@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>CAB Event Survey System</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
     <style>
         :root {
             --bg-dark: #000000;
@@ -33,26 +34,11 @@
 
         .no-save-pass { -webkit-text-security: disc !important; text-security: disc !important; }
 
-        /* Updated Background Container - Blue/Purple Glow */
         #bg-container { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: -2; 
-            overflow: hidden; 
-            background-color: #000000;
-            /* Radial gradients using the specific UI accent colors */
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(10, 132, 255, 0.25) 0%, transparent 50%), /* Blue Top-Left */
-                radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.25) 0%, transparent 50%); /* Purple Bottom-Right */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; overflow: hidden; background-color: #000000;
+            background-image: radial-gradient(circle at 10% 20%, rgba(10, 132, 255, 0.25) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(191, 90, 242, 0.25) 0%, transparent 50%);
         }
 
-        .bg-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2s ease-in-out; }
-        .bg-slide.active { opacity: 0.7; }
-        
-        /* Reduced overlay opacity so the blue/purple shows through */
         #bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(var(--blur-bg)); -webkit-backdrop-filter: blur(var(--blur-bg)); }
 
         .app-container { position: relative; max-width: 1280px; margin: 0 auto; padding: 20px 16px; min-height: 100vh; display: flex; flex-direction: column; }
@@ -70,7 +56,6 @@
 
         .form-group { margin-bottom: 28px; }
         .form-label { display: block; margin-bottom: 12px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.4; }
-
         .required-mark { color: #FF3B30; margin-left: 4px; font-weight: bold; }
         
         input.control-item, select.control-item, textarea.control-item { 
@@ -79,13 +64,7 @@
             outline: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
-        .control-item:focus { 
-            border-color: #0A84FF; 
-            background: rgba(255,255,255,0.12); 
-            box-shadow: 0 0 15px rgba(10, 132, 255, 0.4), 0 0 2px rgba(191, 90, 242, 0.4);
-            transform: scale(1.01);
-        }
-
+        .control-item:focus { border-color: #0A84FF; background: rgba(255,255,255,0.12); box-shadow: 0 0 15px rgba(10, 132, 255, 0.4), 0 0 2px rgba(191, 90, 242, 0.4); transform: scale(1.01); }
         select.control-item { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 24px center; background-size: 16px; padding-right: 52px; }
         textarea.control-item { min-height: 120px; resize: vertical; }
         
@@ -107,6 +86,7 @@
         @media (min-width: 768px) { .btn { width: auto; } }
 
         .btn-primary { background: var(--gradient-accent); color: white; box-shadow: 0 10px 20px rgba(10, 132, 255, 0.2); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
         .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.08); margin-right: 6px; }
         
@@ -115,7 +95,6 @@
         .list-name { flex: 1; font-size: 0.95rem; line-height: 1.4; }
         .list-remove { color: #FF3B30; cursor: pointer; font-size: 1.4rem; font-weight: bold; width: 32px; text-align: center; }
         
-        /* MOVE CONTROLS */
         .move-controls { display: flex; gap: 4px; margin-right: 8px; }
         .move-btn { background: rgba(255, 255, 255, 0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.2s; }
         .move-btn:hover { background: rgba(255, 255, 255, 0.2); }
@@ -140,9 +119,7 @@
         footer { margin-top:auto; padding:60px 0 40px; text-align:center; color: rgba(255, 255, 255, 0.4); font-size: 0.75rem; letter-spacing: 0.05em; line-height: 1.6; }
         
         .center-btn-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 20px; }
-
         .success-icon { width: 80px; height: 80px; background: var(--gradient-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; color: white; box-shadow: 0 10px 20px rgba(52, 199, 89, 0.3); }
-
         .survey-header-center { text-align: center; margin-bottom: 30px; }
     </style>
 </head>
@@ -158,7 +135,7 @@
         <div class="frosted survey-card">
             <div class="survey-header-center">
                 <h3 style="margin-top:0; font-size: 1.8rem; letter-spacing: -0.02em;" id="surveyTitle">Event Experience Survey</h3>
-                <p id="surveyDesc" style="color: var(--text-muted); margin: 10px auto; line-height: 1.6; max-width: 90%;">You're the reason we're here. Take 60 seconds to share your thoughts and help us plan the rest of the year!</p>
+                <p id="surveyDesc" style="color: var(--text-muted); margin: 10px auto; line-height: 1.6; max-width: 90%;">Loading survey details...</p>
                 <span style="font-size: 0.7rem; color: #FF3B30; font-weight: 700; text-transform: uppercase;">* Required Field</span>
             </div>
 
@@ -173,8 +150,8 @@
                 <label class="form-label">
                     <span id="label-eventSelect">Which Event Would You Like To Survey?</span><span class="required-mark">*</span>
                 </label>
-                <select id="formEvent" class="control-item" onchange="checkEventType()">
-                    <option value="">Select an event...</option>
+                <select id="formEvent" class="control-item" onchange="window.checkEventType()">
+                    <option value="">Loading events...</option>
                 </select>
             </div>
 
@@ -182,7 +159,7 @@
                 <div class="form-group">
                     <label class="form-label"><span id="label-cabRating">How would you rate your overall experience at this event?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars cab-stars">
-                        <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
+                        <span class="star" data-value="1" onclick="window.setRating(1)">★</span><span class="star" data-value="2" onclick="window.setRating(2)">★</span><span class="star" data-value="3" onclick="window.setRating(3)">★</span><span class="star" data-value="4" onclick="window.setRating(4)">★</span><span class="star" data-value="5" onclick="window.setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -225,12 +202,11 @@
                 <div class="form-group">
                     <label class="form-label"><span id="label-mktRating">How would you rate your overall experience at the Student Market?</span><span class="required-mark">*</span></label>
                     <div class="rating-stars mkt-stars">
-                        <span class="star" data-value="1" onclick="setRating(1)">★</span><span class="star" data-value="2" onclick="setRating(2)">★</span><span class="star" data-value="3" onclick="setRating(3)">★</span><span class="star" data-value="4" onclick="setRating(4)">★</span><span class="star" data-value="5" onclick="setRating(5)">★</span>
+                        <span class="star" data-value="1" onclick="window.setRating(1)">★</span><span class="star" data-value="2" onclick="window.setRating(2)">★</span><span class="star" data-value="3" onclick="window.setRating(3)">★</span><span class="star" data-value="4" onclick="window.setRating(4)">★</span><span class="star" data-value="5" onclick="window.setRating(5)">★</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><span id="label-mktFavorite">What did you enjoy most about this market?
-</span><span class="required-mark">*</span></label>
+                    <label class="form-label"><span id="label-mktFavorite">What did you enjoy most about this market?</span><span class="required-mark">*</span></label>
                     <textarea id="mktFavorite" class="control-item" placeholder="Type here..."></textarea>
                 </div>
                 <div class="form-group">
@@ -267,7 +243,7 @@
             </div>
 
             <div class="center-btn-wrapper">
-                <button class="btn btn-primary" id="submitBtn" onclick="submitSurvey()">
+                <button class="btn btn-primary" id="submitBtn" onclick="window.submitSurvey()">
                     <span>Submit Feedback</span>
                     <div class="loader" id="submitLoader"></div>
                 </button>
@@ -281,7 +257,7 @@
             <h2 style="margin-top:0">Thank You!</h2>
             <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 32px;">Your feedback has been successfully submitted.</p>
             <div class="center-btn-wrapper">
-                <button class="btn btn-primary" onclick="resetFormAndReturn()">Submit Another Response</button>
+                <button class="btn btn-primary" onclick="window.resetFormAndReturn()">Submit Another Response</button>
             </div>
         </div>
     </div>
@@ -291,8 +267,12 @@
             <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
                 <h2 style="margin:0">Admin Console</h2>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn btn-ghost" style="padding: 10px 16px; font-size: 0.8rem; width: auto;" onclick="switchView('dashboard')">Analytics</button>
-                    <button class="btn btn-ghost" style="padding: 10px 16px; font-size: 0.8rem; width: auto;" onclick="switchView('survey')">Exit Admin</button>
+                    <button class="btn btn-ghost" style="padding: 10px 16px; font-size: 0.8rem; width: auto;" onclick="window.switchView('dashboard')">Analytics</button>
+                    <button class="btn btn-ghost" style="padding: 10px 16px; font-size: 0.8rem; width: auto;" onclick="window.switchView('survey')">Exit Admin</button>
+                    <button class="btn btn-primary" style="padding: 10px 16px; font-size: 0.8rem; width: auto;" id="generateAiBtn" onclick="window.generateSummaries()">
+                        <span>✨ Generate AI Summaries</span>
+                        <div class="loader" id="aiLoader"></div>
+                    </button>
                 </div>
             </div>
 
@@ -303,16 +283,19 @@
                         <div id="event-list-manager" class="list-manager"></div>
                         <div style="display:flex; gap:8px; margin-top:16px;">
                             <input type="text" id="newEventName" class="control-item" placeholder="Event Name..." />
-                            <button class="btn btn-primary" style="width: auto; padding: 0 20px;" onclick="addEventUI()">Add</button>
+                            <button class="btn btn-primary" style="width: auto; padding: 0 20px;" onclick="window.addEventUI()">Add</button>
                         </div>
                     </div>
                     
                     <div class="settings-section">
-                        <div class="settings-title">Global Branding</div>
+                        <div class="settings-title">Global Branding & Integrations</div>
                         <div class="form-group"><label class="form-label">Banner Image URL</label><input type="text" id="setHeaderImg" class="control-item" /></div>
                         <div class="form-group"><label class="form-label">Intro Text</label><textarea id="setDesc" class="control-item" style="min-height:80px"></textarea></div>
-                        <div class="form-group"><label class="form-label">New Password</label>
-                            <input type="text" id="setNewPass" class="control-item no-save-pass" placeholder="Change password..." autocomplete="new-password" spellcheck="false" />
+                        <div class="form-group"><label class="form-label">OpenRouter API Key (Henry AI)</label>
+                            <input type="password" id="setOpenRouterKey" class="control-item no-save-pass" placeholder="sk-or-..." autocomplete="off" spellcheck="false" />
+                        </div>
+                        <div class="form-group"><label class="form-label">New Admin Password</label>
+                            <input type="password" id="setNewPass" class="control-item no-save-pass" placeholder="Change password..." autocomplete="new-password" spellcheck="false" />
                         </div>
                     </div>
                 </div>
@@ -344,7 +327,7 @@
             </div>
             
             <div class="center-btn-wrapper">
-                <button class="btn btn-primary" id="saveConfigBtn" onclick="saveAdminSettings()">
+                <button class="btn btn-primary" id="saveConfigBtn" onclick="window.saveAdminSettings()">
                     <span>Save All Changes</span>
                     <div class="loader" id="saveLoader"></div>
                 </button>
@@ -354,11 +337,10 @@
 
     <div id="dashboardView" class="view">
         <div style="margin-bottom: 40px; display:flex; flex-direction: column; gap: 12px;">
-            <input id="search" class="control-item" type="text" placeholder="Search events..." />
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button onclick="syncSheetData()" class="btn btn-ghost" style="flex: 1; min-width: 120px;">🔄 Refresh</button>
-                <button onclick="switchView('settings')" class="btn btn-ghost" style="flex: 1; min-width: 120px;">⚙️ Settings</button>
-                <button onclick="switchView('survey')" class="btn btn-ghost" style="flex: 1; min-width: 120px;">Survey View</button>
+                <button onclick="window.fetchDashboardData()" class="btn btn-ghost" style="flex: 1; min-width: 120px;">🔄 Refresh Dashboard</button>
+                <button onclick="window.switchView('settings')" class="btn btn-ghost" style="flex: 1; min-width: 120px;">⚙️ Settings</button>
+                <button onclick="window.switchView('survey')" class="btn btn-ghost" style="flex: 1; min-width: 120px;">Survey View</button>
             </div>
         </div>
         <div id="dashboard"></div>
@@ -366,21 +348,32 @@
 
     <footer>
         © 2026 Canyon Activities Board <br>
-        <button class="btn btn-ghost" id="adminLoginBtn" style="font-size:0.7rem; opacity:0.4; width: auto; margin-top:10px; border:none;" onclick="showGate()">Admin Access</button>
+        <button class="btn btn-ghost" id="adminLoginBtn" style="font-size:0.7rem; opacity:0.4; width: auto; margin-top:10px; border:none;" onclick="window.showGate()">Admin Access</button>
     </footer>
 </div>
 
-<div id="gateModal" class="modal"><div class="modal-bg" onclick="hideGate()"></div>
+<div id="gateModal" class="modal"><div class="modal-bg" onclick="window.hideGate()"></div>
     <div class="modal-content"><h3 style="margin-top:0">Authorization Required</h3><p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Enter board password to continue.</p>
-        <input type="text" id="adminPass" class="control-item no-save-pass" placeholder="Password" style="margin-bottom:20px" autocomplete="off" spellcheck="false" onkeyup="if(event.key==='Enter') verifyAdmin()"/>
-        <button class="btn btn-primary" id="gateBtn" onclick="verifyAdmin()"><span>Authorize & Login</span><div class="loader" id="gateLoader"></div></button>
+        <input type="password" id="adminPass" class="control-item no-save-pass" placeholder="Password" style="margin-bottom:20px" autocomplete="off" spellcheck="false" onkeyup="if(event.key==='Enter') window.verifyAdmin()"/>
+        <button class="btn btn-primary" id="gateBtn" onclick="window.verifyAdmin()"><span>Authorize & Login</span><div class="loader" id="gateLoader"></div></button>
     </div>
 </div>
 
 <div id="toast">Update Successful</div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3QFydA5aCuJFFKw2A7oBEJ9G9IBoysQOGfS7XVooXJ-F23vqbfl5_LMpt1UbCERI/exec"; 
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://hpkhhtzbhkjkdfprsmnt.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_--X_qzfO-yz_IPK1IN-sug_l83Dwmn2'; 
+    
+    // Initialize Supabase Client safely to avoid global variable conflicts
+    let supabaseClient = null;
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.error("Supabase failed to load. Check ad blockers or network connection.");
+    }
+
     let state = { 
         responses: [], 
         config: {}, 
@@ -395,71 +388,119 @@
         ]
     };
 
-    let bgIndex = 0;
-    let bgInterval = null;
+    // Start App robustly
+    function initApp() {
+        syncData();
+        switchView('survey');
+    }
 
-    async function init() { switchView('survey'); syncSheetData(); }
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
 
-    function switchView(viewName) {
+    window.switchView = function(viewName) {
         state.view = viewName;
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         const target = document.getElementById(viewName + 'View');
         if (target) target.classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (viewName === 'dashboard') {
+            window.fetchDashboardData();
+        }
     }
 
-    async function syncSheetData() {
+    async function syncData() {
         try {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            state.responses = data.overview;
-            state.config = data.config;
+            if (!supabaseClient) throw new Error("Supabase client not initialized");
+            const { data: configDoc, error } = await supabaseClient
+                .from('config')
+                .select('data')
+                .eq('id', 'global')
+                .maybeSingle();
+            
+            if (configDoc && configDoc.data) {
+                state.config = configDoc.data;
+            } else {
+                // Initialize default config if database is empty
+                state.config = {
+                    Events: "Welcome Week,Spring Fest,Student Market",
+                    MarketEvents: "Student Market",
+                    HeaderImageURL: "https://i.imgur.com/HJTTEzA.png",
+                    SurveyDescription: "You're the reason we're here. Take 60 seconds to share your thoughts and help us plan the rest of the year!"
+                };
+                
+                // Set default config
+                await supabaseClient.from('config').insert([{ id: 'global', data: state.config }]);
+                
+                // Setup default password inside a separate document
+                const { data: secretCheck } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
+                if (!secretCheck) {
+                    await supabaseClient.from('config').insert([{ id: 'secrets', data: { adminPass: "admin123" } }]);
+                }
+            }
+
             const all = (state.config.Events || "").split(',').map(s => s.trim()).filter(Boolean);
             const mkt = (state.config.MarketEvents || "").split(',').map(s => s.trim()).filter(Boolean);
             state.tempEvents = all.map(name => ({ name, isMarket: mkt.includes(name) }));
+            
             applyConfig();
-            // initBackgroundRotation(); // Disabled to keep background clean per user request
-            if (state.view === 'dashboard') renderDashboard();
-        } catch (e) { console.error("Sync error", e); }
-    }
-
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+        } catch (e) { 
+            console.error("Sync error", e); 
         }
-        return array;
     }
 
-    function initBackgroundRotation() {
-        const bgContainer = document.getElementById('bg-container');
-        let images = state.responses.map(r => r.imageurl).filter(url => url && url.startsWith('http'));
-        if (images.length === 0) return;
-        images = shuffleArray(images);
-        bgContainer.innerHTML = '';
-        images.forEach((url, i) => {
-            const slide = document.createElement('div');
-            slide.className = 'bg-slide';
-            slide.style.backgroundImage = `url('${url}')`;
-            if (i === 0) slide.classList.add('active');
-            bgContainer.appendChild(slide);
-        });
-        bgIndex = 0; 
-        if (bgInterval) clearInterval(bgInterval);
-        if (images.length > 1) {
-            bgInterval = setInterval(() => {
-                const slides = document.querySelectorAll('.bg-slide');
-                if (slides.length === 0) return;
-                slides[bgIndex].classList.remove('active');
-                bgIndex = (bgIndex + 1) % slides.length;
-                slides[bgIndex].classList.add('active');
-            }, 8000); 
+    window.fetchDashboardData = async function() {
+        try {
+            if (!supabaseClient) throw new Error("Supabase client not initialized");
+            const { data: querySnapshot, error } = await supabaseClient
+                .from('responses')
+                .select('data');
+                
+            if (error) throw error;
+            
+            const overviewMap = {};
+            
+            (querySnapshot || []).forEach((row) => {
+                const r = row.data; // Reading from the JSONB data column
+                if (!r || !r.event) return;
+                
+                if (!overviewMap[r.event]) {
+                    overviewMap[r.event] = { eventname: r.event, surveys: 0, totalRating: 0, attendance: "Live Data", hostingteam: "CAB Team", summary: "Aggregated successfully from database.", isMarket: r.isMarket };
+                }
+                overviewMap[r.event].surveys += 1;
+                overviewMap[r.event].totalRating += Number(r.rating) || 0;
+            });
+
+            // Fetch Henry AI Summaries from our new event_overviews table
+            const { data: overviews } = await supabaseClient.from('event_overviews').select('*');
+            if (overviews) {
+                overviews.forEach(ov => {
+                    if (overviewMap[ov.eventname]) {
+                        overviewMap[ov.eventname].summary = ov.summary;
+                        overviewMap[ov.eventname].attendance = ov.attendance;
+                        overviewMap[ov.eventname].hostingteam = ov.hostingteam;
+                    }
+                });
+            }
+
+            state.responses = Object.values(overviewMap).map(o => ({
+                ...o,
+                rating: (o.totalRating / o.surveys).toFixed(1)
+            }));
+            
+            renderDashboard();
+        } catch(e) {
+            console.error("Dashboard error", e);
         }
     }
 
     function applyConfig() {
         if (state.config.HeaderImageURL) document.getElementById('bannerImg').src = state.config.HeaderImageURL;
         if (state.config.SurveyDescription) document.getElementById('surveyDesc').textContent = state.config.SurveyDescription;
+        
         state.questionKeys.forEach(key => {
             const labelEl = document.getElementById('label-' + key);
             const inputEl = document.getElementById('q-' + key);
@@ -467,6 +508,7 @@
             if (val && labelEl) labelEl.textContent = val;
             if (inputEl) inputEl.value = val || (labelEl ? labelEl.textContent : "");
         });
+
         document.getElementById('formEvent').innerHTML = '<option value="">Select an event...</option>' + state.tempEvents.map(e => `<option value="${e.name}">${e.name}</option>`).join('');
         const hear = (state.config.HearAboutOptions || "Instagram,Email,Flyer,LopeLife App,Word of Mouth").split(',');
         document.getElementById('formHearAbout').innerHTML = '<option value="">Select...</option>' + hear.map(h => `<option value="${h.trim()}">${h.trim()}</option>`).join('');
@@ -480,19 +522,19 @@
         box.innerHTML = state.tempEvents.map((ev, idx) => `
             <div class="list-row">
                 <div class="move-controls">
-                    <button class="move-btn" onclick="moveEvent(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
-                    <button class="move-btn" onclick="moveEvent(${idx}, 1)" ${idx === state.tempEvents.length - 1 ? 'disabled' : ''}>↓</button>
+                    <button class="move-btn" onclick="window.moveEvent(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                    <button class="move-btn" onclick="window.moveEvent(${idx}, 1)" ${idx === state.tempEvents.length - 1 ? 'disabled' : ''}>↓</button>
                 </div>
                 <span class="list-name">${ev.name}</span>
                 <label class="market-toggle" style="font-size: 0.75rem; color: var(--text-muted);">
-                    <input type="checkbox" ${ev.isMarket ? 'checked' : ''} onchange="toggleMarketFlag(${idx}, this.checked)"> Market
+                    <input type="checkbox" ${ev.isMarket ? 'checked' : ''} onchange="window.toggleMarketFlag(${idx}, this.checked)"> Market
                 </label>
-                <div class="list-remove" onclick="removeEventUI(${idx})">&times;</div>
+                <div class="list-remove" onclick="window.removeEventUI(${idx})">&times;</div>
             </div>
         `).join('');
     }
 
-    function moveEvent(index, direction) {
+    window.moveEvent = function(index, direction) {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= state.tempEvents.length) return;
         const element = state.tempEvents.splice(index, 1)[0];
@@ -500,31 +542,49 @@
         renderEventSettings();
     }
 
-    function toggleMarketFlag(idx, val) { state.tempEvents[idx].isMarket = val; }
-    function removeEventUI(idx) { state.tempEvents.splice(idx, 1); renderEventSettings(); }
-    function addEventUI() { const name = document.getElementById('newEventName').value.trim(); if(!name) return; state.tempEvents.push({ name, isMarket: false }); document.getElementById('newEventName').value = ""; renderEventSettings(); }
+    window.toggleMarketFlag = function(idx, val) { state.tempEvents[idx].isMarket = val; }
+    window.removeEventUI = function(idx) { state.tempEvents.splice(idx, 1); renderEventSettings(); }
+    
+    window.addEventUI = function() { 
+        const name = document.getElementById('newEventName').value.trim(); 
+        if(!name) return; 
+        state.tempEvents.push({ name, isMarket: false }); 
+        document.getElementById('newEventName').value = ""; 
+        renderEventSettings(); 
+    }
 
-    function checkEventType() {
+    window.checkEventType = function() {
         const selected = document.getElementById('formEvent').value;
         const evData = state.tempEvents.find(e => e.name === selected);
         state.isMarket = evData ? evData.isMarket : false;
+        
         document.getElementById('branchCAB').style.display = state.isMarket ? 'none' : 'block';
         document.getElementById('branchMarket').style.display = state.isMarket ? 'block' : 'none';
+        
         const qTitle = state.isMarket ? (state.config['q-eventSelect'] || "Which Student Market Would You Like To Survey?") : (state.config['q-eventSelect'] || "Which Event Would You Like To Survey?");
         const selectionLabel = document.getElementById('label-eventSelect');
         if (selectionLabel) selectionLabel.textContent = qTitle;
-        state.currentRating = 0; document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+        
+        state.currentRating = 0; 
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
     }
 
-    function setRating(val) { state.currentRating = val; const stars = state.isMarket ? document.querySelectorAll('.mkt-stars .star') : document.querySelectorAll('.cab-stars .star'); document.querySelectorAll('.star').forEach(s => s.classList.remove('selected')); stars.forEach((s, i) => { if(i < val) s.classList.add('selected'); }); }
+    window.setRating = function(val) { 
+        state.currentRating = val; 
+        const stars = state.isMarket ? document.querySelectorAll('.mkt-stars .star') : document.querySelectorAll('.cab-stars .star'); 
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected')); 
+        stars.forEach((s, i) => { if(i < val) s.classList.add('selected'); }); 
+    }
 
-    function resetFormAndReturn() {
+    window.resetFormAndReturn = function() {
         state.currentRating = 0; state.isMarket = false;
         const formFields = ['formStudentID', 'formEvent', 'formFirstTime', 'formHearAbout', 'formFavorite', 'formImprove', 'formLikely', 'formStaff', 'mktFavorite', 'mktFirstTime', 'mktVariety', 'mktPurchase', 'formComments'];
-        formFields.forEach(f => document.getElementById(f).value = "");
+        formFields.forEach(f => {
+            if(document.getElementById(f)) document.getElementById(f).value = "";
+        });
         document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
-        switchView('survey');
-        checkEventType();
+        window.switchView('survey');
+        window.checkEventType();
     }
 
     function fireConfetti() {
@@ -541,12 +601,24 @@
         }, 250);
     }
 
-    async function submitSurvey() {
+    window.submitSurvey = async function() {
+        if (!supabaseClient) return showToast("Database not connected yet.", true);
+
         const studentID = document.getElementById('formStudentID').value;
         const event = document.getElementById('formEvent').value;
         const rating = state.currentRating;
+        
         if (!studentID || !event || rating === 0) return showToast("Please provide ID, Event, and Rating.", true);
-        let data = { studentID, event, rating, comments: document.getElementById('formComments').value, isMarket: state.isMarket };
+        
+        let data = { 
+            studentID, 
+            event, 
+            rating, 
+            comments: document.getElementById('formComments').value, 
+            isMarket: state.isMarket,
+            timestamp: new Date().toISOString()
+        };
+        
         if (state.isMarket) {
             const favorite = document.getElementById('mktFavorite').value;
             const firstTime = document.getElementById('mktFirstTime').value;
@@ -564,61 +636,318 @@
             if (!firstTime || !hearAbout || !favorite || !improve || !likely || !staff) return showToast("Please answer all required questions.", true);
             data = { ...data, firstTime, hearAbout, favoritePart: favorite, improve, likelyToReturn: likely, staffConnect: staff };
         }
-        switchView('success');
-        fireConfetti();
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }).catch(e => console.error(e));
-    }
 
-    function showGate() { document.getElementById('gateModal').classList.add('show'); }
-    function hideGate() { document.getElementById('gateModal').classList.remove('show'); document.getElementById('adminPass').value = ""; }
+        const btn = document.getElementById('submitBtn'); 
+        btn.disabled = true; 
+        document.getElementById('submitLoader').style.display = "block";
 
-    async function verifyAdmin() {
-        const pass = document.getElementById('adminPass').value;
-        const btn = document.getElementById('gateBtn'); btn.disabled = true; document.getElementById('gateLoader').style.display = "block";
         try {
-            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "verifyPassword", password: pass }) });
-            const result = await res.json();
-            if (result.success) { state.isAdmin = true; hideGate(); showToast("Access Granted"); document.getElementById('adminLoginBtn').textContent = "Admin Console"; switchView('settings'); } else { showToast("Incorrect Password", true); }
-        } catch (e) { showToast("Error connecting", true); }
-        finally { btn.disabled = false; document.getElementById('gateLoader').style.display = "none"; }
+            // 1. Send payload to JSONB data column
+            const { error } = await supabaseClient.from('responses').insert([{ data: data }]);
+            if (error) throw error;
+            
+            // 2. Instantly show success to the user so they don't have to wait for the AI
+            window.switchView('success');
+            fireConfetti();
+
+            // 3. SILENT BACKGROUND PROCESS: Auto-generate Henry AI Summary
+            (async () => {
+                try {
+                    // Fetch OpenRouter Key
+                    const { data: secretDoc } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
+                    const openRouterKey = secretDoc?.data?.openRouterKey;
+                    if (!openRouterKey) return; // Exit silently if no API key is setup
+
+                    // Fetch all existing responses to calculate new average and get text
+                    const { data: allResponses } = await supabaseClient.from('responses').select('data');
+                    
+                    let count = 0;
+                    let sumRating = 0;
+                    let feedbackText = "";
+
+                    (allResponses || []).forEach(row => {
+                        const r = row.data;
+                        if (r && r.event === event) { // Only process the event that was just submitted
+                            count++;
+                            sumRating += Number(r.rating) || 0;
+                            if (!r.isMarket) {
+                                feedbackText += `Rating: ${r.rating}. Favorite: ${r.favoritePart}. Improve: ${r.improve}. Comments: ${r.comments}\n`;
+                            } else {
+                                feedbackText += `MKT Rating: ${r.rating}. Favorite/Enjoy: ${r.favoritePart}. Comments: ${r.comments}\n`;
+                            }
+                        }
+                    });
+
+                    if (count > 0) {
+                        const avgRating = (sumRating / count).toFixed(1);
+                        // Ask Henry to summarize the newly compiled feedback
+                        const newSummary = await callOpenRouter(openRouterKey, feedbackText);
+                        
+                        // Push the new summary and math back up to Supabase
+                        await supabaseClient.from('event_overviews').upsert({
+                            eventname: event,
+                            summary: newSummary,
+                            rating: Number(avgRating),
+                            surveys: count,
+                            last_updated: new Date().toISOString()
+                        });
+                        
+                        // Refresh the local dashboard silently
+                        window.fetchDashboardData();
+                    }
+                } catch (backgroundError) {
+                    console.error("Background AI generation failed:", backgroundError);
+                }
+            })();
+
+        } catch(e) {
+            console.error(e);
+            showToast("Error submitting survey.", true);
+        } finally {
+            btn.disabled = false;
+            document.getElementById('submitLoader').style.display = "none";
+        }
     }
 
-    async function saveAdminSettings() {
+    window.showGate = function() { document.getElementById('gateModal').classList.add('show'); }
+    window.hideGate = function() { document.getElementById('gateModal').classList.remove('show'); document.getElementById('adminPass').value = ""; }
+
+    window.verifyAdmin = async function() {
+        const pass = document.getElementById('adminPass').value;
+        const btn = document.getElementById('gateBtn'); 
+        btn.disabled = true; 
+        document.getElementById('gateLoader').style.display = "block";
+        
+        try {
+            if (!supabaseClient) throw new Error("Supabase client not initialized");
+            const { data: secretDoc } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
+            
+            let validPass = "admin123";
+            if (secretDoc && secretDoc.data && secretDoc.data.adminPass) {
+                validPass = secretDoc.data.adminPass;
+            } else {
+                await supabaseClient.from('config').insert([{ id: 'secrets', data: { adminPass: validPass } }]);
+            }
+
+            if (pass === validPass) { 
+                state.isAdmin = true; 
+                window.hideGate(); 
+                showToast("Access Granted"); 
+                document.getElementById('adminLoginBtn').textContent = "Admin Console"; 
+                
+                // Populate OpenRouter key if it exists
+                if (secretDoc && secretDoc.data && secretDoc.data.openRouterKey) {
+                    document.getElementById('setOpenRouterKey').value = secretDoc.data.openRouterKey;
+                }
+
+                window.switchView('settings'); 
+            } else { 
+                showToast("Incorrect Password", true); 
+            }
+        } catch (e) { 
+            showToast("Error connecting", true); 
+        } finally { 
+            btn.disabled = false; 
+            document.getElementById('gateLoader').style.display = "none"; 
+        }
+    }
+
+    window.saveAdminSettings = async function() {
         const config = { 
             Events: state.tempEvents.map(e => e.name).join(','), 
             MarketEvents: state.tempEvents.filter(e => e.isMarket).map(e => e.name).join(','), 
             HeaderImageURL: document.getElementById('setHeaderImg').value, 
             SurveyDescription: document.getElementById('setDesc').value 
         };
-        state.questionKeys.forEach(key => { config['q-' + key] = document.getElementById('q-' + key).value; });
+        
+        state.questionKeys.forEach(key => { 
+            config['q-' + key] = document.getElementById('q-' + key).value; 
+        });
+        
         const newPass = document.getElementById('setNewPass').value.trim();
-        const btn = document.getElementById('saveConfigBtn'); btn.disabled = true; document.getElementById('saveLoader').style.display = "block";
+        const openRouterKey = document.getElementById('setOpenRouterKey').value.trim();
+        
+        const btn = document.getElementById('saveConfigBtn'); 
+        btn.disabled = true; 
+        document.getElementById('saveLoader').style.display = "block";
+        
         try {
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "updateConfig", config }) });
-            if (newPass) await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "changePassword", newPassword: newPass }) });
-            showToast("Settings Updated!"); await syncSheetData(); switchView('settings');
-        } catch (e) { showToast("Save Failed", true); }
-        finally { btn.disabled = false; document.getElementById('saveLoader').style.display = "none"; }
+            if (!supabaseClient) throw new Error("Supabase client not initialized");
+            // Save global configuration using UPSERT
+            await supabaseClient.from('config').upsert({ id: 'global', data: config });
+            
+            // Get existing secrets so we don't overwrite them accidentally
+            const { data: secretDoc } = await supabaseClient.from('config').select('data').eq('id', 'secrets').maybeSingle();
+            let secrets = secretDoc?.data || {};
+            
+            if (newPass) secrets.adminPass = newPass;
+            if (openRouterKey) secrets.openRouterKey = openRouterKey;
+            
+            await supabaseClient.from('config').upsert({ id: 'secrets', data: secrets });
+            if (newPass) document.getElementById('setNewPass').value = "";
+            
+            showToast("Settings Updated!"); 
+            await syncData(); 
+            window.switchView('settings');
+        } catch (e) { 
+            showToast("Save Failed", true); 
+            console.error(e);
+        } finally { 
+            btn.disabled = false; 
+            document.getElementById('saveLoader').style.display = "none"; 
+        }
+    }
+
+    // --- HENRY AI CORE LOGIC ---
+    window.generateSummaries = async function() {
+        const btn = document.getElementById('generateAiBtn');
+        btn.disabled = true;
+        document.getElementById('aiLoader').style.display = "block";
+
+        try {
+            if (!supabaseClient) throw new Error("Supabase client not initialized");
+            // 1. Get OpenRouter Key
+            const { data: secretDoc } = await supabaseClient.from('config').select('data').eq('id', 'secrets').single();
+            const openRouterKey = secretDoc?.data?.openRouterKey;
+
+            if (!openRouterKey) {
+                showToast("Please save OpenRouter API Key in settings first.", true);
+                return;
+            }
+
+            showToast("Gathering responses...");
+
+            // 2. Fetch Data from Supabase
+            const { data: responses } = await supabaseClient.from('responses').select('data, created_at');
+            const { data: overviews } = await supabaseClient.from('event_overviews').select('*');
+
+            const overviewMap = {};
+            (overviews || []).forEach(o => { overviewMap[o.eventname] = new Date(o.last_updated).getTime(); });
+
+            // 3. Group Responses
+            const eventData = {};
+            (responses || []).forEach(row => {
+                const r = row.data;
+                if (!r || !r.event) return;
+                
+                const eventName = r.event;
+                const surveyTime = new Date(r.timestamp || row.created_at).getTime();
+
+                if (!eventData[eventName]) {
+                    eventData[eventName] = { latestSurvey: 0, count: 0, sumRating: 0, feedbackText: "", isMarket: r.isMarket };
+                }
+
+                eventData[eventName].count++;
+                eventData[eventName].sumRating += Number(r.rating) || 0;
+                if (surveyTime > eventData[eventName].latestSurvey) {
+                    eventData[eventName].latestSurvey = surveyTime;
+                }
+
+                if (!r.isMarket) {
+                    eventData[eventName].feedbackText += `Rating: ${r.rating}. Favorite: ${r.favoritePart}. Improve: ${r.improve}. Comments: ${r.comments}\n`;
+                } else {
+                    eventData[eventName].feedbackText += `MKT Rating: ${r.rating}. Favorite/Enjoy: ${r.favoritePart}. Comments: ${r.comments}\n`;
+                }
+            });
+
+            // 4. Update those needing updates
+            let updatedCount = 0;
+            for (const eventName in eventData) {
+                const data = eventData[eventName];
+                const lastUpdated = overviewMap[eventName] || 0;
+
+                if (data.latestSurvey > lastUpdated || !overviewMap[eventName]) {
+                    showToast(`Asking Henry about ${eventName}...`);
+                    const avgRating = (data.sumRating / data.count).toFixed(1);
+                    const summary = await callOpenRouter(openRouterKey, data.feedbackText);
+
+                    await supabaseClient.from('event_overviews').upsert({
+                        eventname: eventName,
+                        summary: summary,
+                        rating: Number(avgRating),
+                        surveys: data.count,
+                        last_updated: new Date().toISOString()
+                    });
+                    updatedCount++;
+                }
+            }
+
+            if (updatedCount === 0) {
+                showToast("All summaries are already up to date!");
+            } else {
+                showToast(`Success! Generated ${updatedCount} new summaries.`);
+            }
+            
+            window.fetchDashboardData(); 
+        } catch (error) {
+            console.error(error);
+            showToast("Error generating summaries.", true);
+        } finally {
+            btn.disabled = false;
+            document.getElementById('aiLoader').style.display = "none";
+        }
+    }
+
+    async function callOpenRouter(apiKey, text) {
+        if (!text.trim()) return "Collecting student feedback...";
+        try {
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": window.location.href,
+                    "X-Title": "CAB-Survey"
+                },
+                body: JSON.stringify({
+                    model: "deepseek/deepseek-chat",
+                    messages: [{
+                        role: "user",
+                        content: `You are Henry, the CAB team's insightful advisor. Write a 3 to 5 sentence summary of the following student feedback. 
+                        STYLE GUIDELINES:
+                        - Use a warm, professional, and observant human tone.
+                        - Write in cohesive prose only; NEVER use lists, bullet points, or numbers.
+                        - Do not report individual responses one-by-one; instead, synthesize the general mood and key takeaways.
+                        - Avoid robotic phrases like "The data suggests" or "Participants noted."
+                        - Start the analysis immediately. NO introductory filler like "Here is the summary."
+                        Feedback: ${text}`
+                    }]
+                })
+            });
+            const json = await res.json();
+            let out = json?.choices?.[0]?.message?.content?.trim() || "Analysis pending.";
+            return out.replace(/^(Summary|Analysis|Henry|Observation).*?:\s*/i, "").replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1");
+        } catch (e) {
+            console.error("OpenRouter error:", e);
+            return "Summary generation failed. Henry might be offline.";
+        }
     }
 
     function renderDashboard() {
-        const dash = document.getElementById('dashboard'); dash.innerHTML = "";
+        const dash = document.getElementById('dashboard'); 
+        dash.innerHTML = "";
+        
+        if (state.responses.length === 0) {
+            dash.innerHTML = "<p style='color: var(--text-muted);'>No responses recorded yet.</p>";
+            return;
+        }
+
         state.responses.forEach(g => {
             const card = document.createElement('div'); card.className = "frosted card";
             const imgId = Math.abs((g.eventname||"").split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % 1000;
-            const img = g.imageurl || `https://picsum.photos/seed/${imgId}/600/400`;
+            const img = `https://picsum.photos/seed/${imgId}/600/400`;
             card.innerHTML = `<div class="card-header"><img src="${img}" class="card-img"></div>
                 <div class="card-body">
                     <h3 style="margin:0 0 12px 0">${g.eventname}</h3>
                     <div style="margin-bottom:12px">
-                        <span class="badge" style="background:var(--gradient-accent)">★ ${Number(g.rating || 0).toFixed(1)}</span>
-                        <span class="badge">${g.surveys || 0} Surveys</span>
+                        <span class="badge" style="background:var(--gradient-accent)">★ ${g.rating}</span>
+                        <span class="badge">${g.surveys} Surveys</span>
                     </div>
                     <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:15px; display:flex; flex-wrap:wrap; gap:8px;">
-                        <span>👤 Attendance: ${g.attendance || "N/A"}</span>
-                        <span>🏷️ Team: ${g.hostingteam || "CAB"}</span>
+                        <span>👥 Attendance: ${g.attendance}</span>
+                        <span>🏷️ Team: ${g.hostingteam}</span>
                     </div>
-                    <p style="font-size:0.9rem; color:#b0b0b0; line-height:1.6;">${g.summary || "Henry AI summary pending..."}</p>
+                    <p style="font-size:0.9rem; color:#b0b0b0; line-height:1.6;">${g.summary}</p>
                 </div>`;
             dash.appendChild(card);
         });
@@ -631,7 +960,6 @@
         t.style.display = 'block'; 
         setTimeout(() => t.style.display = 'none', 3500); 
     }
-    window.onload = init;
 </script>
 </body>
 </html>
