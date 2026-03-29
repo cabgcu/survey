@@ -569,14 +569,14 @@
             if (!supabaseClient) throw new Error("Supabase client not initialized");
             const { data: querySnapshot, error } = await supabaseClient
                 .from('responses')
-                .select('data');
+                .select('*');
                 
             if (error) throw error;
             
             const overviewMap = {};
             
             (querySnapshot || []).forEach((row) => {
-                const r = row.data; 
+                const r = normalizeResponseRecord(row);
                 if (!r || !r.event) return;
                 
                 if (!overviewMap[r.event]) {
@@ -735,6 +735,72 @@
         }, 250);
     }
 
+    function normalizeResponseRecord(row) {
+        if (!row || typeof row !== 'object') return null;
+        const raw = (row.data && typeof row.data === 'object') ? row.data : row;
+
+        const isMarket = Boolean(
+            raw.isMarket ??
+            raw.is_market ??
+            raw.market_event_name ??
+            raw.marketEventName
+        );
+
+        const event = raw.event || raw.cab_event_name || raw.market_event_name || raw.cabEventName || raw.marketEventName || "";
+        const rating = raw.rating ?? raw.cab_rating ?? raw.market_rating ?? raw.cabRating ?? raw.marketRating ?? 0;
+
+        return {
+            ...raw,
+            event,
+            rating,
+            isMarket,
+            firstTime: raw.firstTime ?? raw.cab_first_time ?? raw.cabFirstTime ?? "",
+            hearAbout: raw.hearAbout ?? raw.cab_hear_about ?? raw.cabHearAbout ?? "",
+            favoritePart: raw.favoritePart ?? raw.cab_favorite_part ?? raw.mkt_favorite_part ?? raw.market_favorite_part ?? "",
+            improve: raw.improve ?? raw.cab_improvements ?? "",
+            likelyToReturn: raw.likelyToReturn ?? raw.cab_likely_return ?? "",
+            staffConnect: raw.staffConnect ?? raw.cab_staff_connect ?? "",
+            comments: raw.comments ?? raw.cab_comments ?? raw.mkt_comments ?? raw.market_comments ?? "",
+            mktFirstTime: raw.mktFirstTime ?? raw.mkt_first_time ?? "",
+            variety: raw.variety ?? raw.mkt_variety_sat ?? "",
+            purchase: raw.purchase ?? raw.mkt_purchase_made ?? "",
+            timestamp: raw.timestamp ?? raw.created_at ?? raw.createdAt
+        };
+    }
+
+    function buildLegacyResponsePayload(data) {
+        const base = {
+            timestamp: data.timestamp,
+            student_id: data.studentID
+        };
+
+        if (data.isMarket) {
+            return {
+                ...base,
+                market_event_name: data.event,
+                market_rating: data.rating,
+                mkt_favorite_part: data.favoritePart,
+                mkt_first_time: data.mktFirstTime,
+                mkt_variety_sat: data.variety,
+                mkt_purchase_made: data.purchase,
+                mkt_comments: data.comments || ""
+            };
+        }
+
+        return {
+            ...base,
+            cab_event_name: data.event,
+            cab_rating: data.rating,
+            cab_first_time: data.firstTime,
+            cab_hear_about: data.hearAbout,
+            cab_favorite_part: data.favoritePart,
+            cab_improvements: data.improve,
+            cab_likely_return: data.likelyToReturn,
+            cab_staff_connect: data.staffConnect,
+            cab_comments: data.comments || ""
+        };
+    }
+
     window.submitSurvey = async function() {
         if (!supabaseClient) return showToast("Database not connected.", true);
 
@@ -776,7 +842,15 @@
         document.getElementById('submitLoader').style.display = "block";
 
         try {
-            const { error } = await supabaseClient.from('responses').insert([{ data: data }]);
+            let { error } = await supabaseClient.from('responses').insert([{ data: data }]);
+            if (error) {
+                const fallbackFlat = await supabaseClient.from('responses').insert([data]);
+                error = fallbackFlat.error;
+            }
+            if (error) {
+                const fallbackLegacy = await supabaseClient.from('responses').insert([buildLegacyResponsePayload(data)]);
+                error = fallbackLegacy.error;
+            }
             if (error) throw error;
             
             window.switchView('success');
@@ -789,12 +863,12 @@
                     const openRouterKey = secretDoc?.data?.openRouterKey;
                     if (!openRouterKey) return; 
 
-                    const { data: allResponses } = await supabaseClient.from('responses').select('data');
+                    const { data: allResponses } = await supabaseClient.from('responses').select('*');
                     
                     let count = 0; let sumRating = 0; let feedbackText = "";
 
                     (allResponses || []).forEach(row => {
-                        const r = row.data;
+                        const r = normalizeResponseRecord(row);
                         if (r && r.event === event) { 
                             count++; sumRating += Number(r.rating) || 0;
                             if (!r.isMarket) {
@@ -822,7 +896,7 @@
 
         } catch(e) {
             console.error(e);
-            showToast("Error submitting survey.", true);
+            showToast(`Error submitting survey: ${e.message || 'Unknown error'}`, true);
         } finally {
             btn.disabled = false;
             document.getElementById('submitLoader').style.display = "none";
@@ -932,7 +1006,7 @@
 
             showToast("Gathering responses...");
 
-            const { data: responses } = await supabaseClient.from('responses').select('data, created_at');
+            const { data: responses } = await supabaseClient.from('responses').select('*');
             const { data: overviews } = await supabaseClient.from('event_overviews').select('*');
 
             const overviewMap = {};
@@ -940,7 +1014,7 @@
 
             const eventData = {};
             (responses || []).forEach(row => {
-                const r = row.data;
+                const r = normalizeResponseRecord(row);
                 if (!r || !r.event) return;
                 
                 const eventName = r.event;
