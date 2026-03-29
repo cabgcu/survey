@@ -526,19 +526,24 @@
         document.getElementById('dbErrorBox').style.display = "none";
 
         try {
+            console.log("DEBUG: About to insert payload:", payload);
             const { data: insertedData, error } = await supabaseClient.from('responses').insert([{ data: payload }]).select();
+            console.log("DEBUG: Insert response - error:", error, "data:", insertedData);
 
             if (error) {
+                console.error("DEBUG: Supabase error:", error);
                 document.getElementById('dbErrorBox').innerHTML = "SUPABASE ERROR: " + error.message;
                 document.getElementById('dbErrorBox').style.display = "block";
                 throw error;
             }
 
             if (!insertedData || insertedData.length === 0) {
+                console.error("DEBUG: No data returned from insert, RLS likely blocked it");
                 document.getElementById('dbErrorBox').innerHTML = "SUPABASE RLS ERROR: Supabase silently blocked the save. Enable INSERT policy for responses table!";
                 document.getElementById('dbErrorBox').style.display = "block";
                 throw new Error("RLS Blocked Insert");
             }
+            console.log("DEBUG: Insert successful, data inserted:", insertedData);
 
             document.getElementById('surveyView').classList.remove('active');
             document.getElementById('successView').classList.add('active');
