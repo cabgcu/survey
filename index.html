@@ -7,19 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --bg-dark: #000000;
-            --glass-surface: rgba(10, 15, 35, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --bg-dark: #0a0e27;
+            --glass-surface: rgba(20, 25, 55, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #ffffff;
-            --text-muted: #d1d1d6;
+            --text-muted: #b0b5d0;
             --gradient-accent: linear-gradient(135deg, #0A84FF, #BF5AF2);
             --gradient-fire: linear-gradient(135deg, #FF9500, #FF3B30);
             --gradient-success: linear-gradient(135deg, #34C759, #30B0C7);
-            --radius-card: 28px;
-            --radius-btn: 16px;
+            --radius-card: 24px;
+            --radius-btn: 14px;
             --blur-bg: 0px;
-            --blur-card: 40px;
+            --blur-card: 30px;
             --max-width-content: 650px;
+            --glow-cyan: #00D9FF;
+            --glow-magenta: #FF1493;
         }
         * {
             box-sizing: border-box;
@@ -98,8 +100,11 @@
             margin: 0 auto;
             border-radius: var(--radius-card);
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1.5px solid;
+            border-image: linear-gradient(135deg, rgba(0, 217, 255, 0.4) 0%, rgba(255, 20, 147, 0.3) 100%) 1;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 217, 255, 0.1);
             background: #111;
             line-height: 0;
         }
@@ -112,26 +117,27 @@
         }
         
         .frosted {
-            background: linear-gradient(135deg, rgba(15, 20, 45, 0.35) 0%, rgba(10, 15, 40, 0.3) 100%);
-            backdrop-filter: blur(var(--blur-card)) brightness(1.12);
-            -webkit-backdrop-filter: blur(var(--blur-card)) brightness(1.12);
-            border: 1.5px solid;
-            border-image: linear-gradient(135deg, #00D9FF 0%, #FF00FF 100%) 1;
+            background: linear-gradient(135deg, rgba(30, 35, 70, 0.7) 0%, rgba(20, 25, 60, 0.65) 100%);
+            backdrop-filter: blur(var(--blur-card)) brightness(1.05);
+            -webkit-backdrop-filter: blur(var(--blur-card)) brightness(1.05);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, var(--glow-cyan) 0%, var(--glow-magenta) 100%) 1;
             box-shadow:
-                0 0 30px rgba(0, 217, 255, 0.3),
-                0 0 60px rgba(255, 0, 255, 0.2),
-                0 40px 100px rgba(0, 0, 0, 0.4),
-                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+                0 0 20px var(--glow-cyan),
+                0 0 40px var(--glow-magenta),
+                0 0 60px rgba(0, 217, 255, 0.4),
+                0 0 80px rgba(255, 20, 147, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.08);
         }
         .survey-card {
             width: 100%;
             max-width: var(--max-width-content);
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
             border-radius: var(--radius-card);
         }
-        @media (min-width: 480px) { .survey-card { padding: 28px; } }
-        @media (min-width: 768px) { .survey-card { padding: 40px; } }
+        @media (min-width: 480px) { .survey-card { padding: 32px; } }
+        @media (min-width: 768px) { .survey-card { padding: 44px; } }
 
         .form-group {
             margin-bottom: 24px;
@@ -153,8 +159,8 @@
         
         input.control-item, select.control-item, textarea.control-item {
             width: 100%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(30, 35, 70, 0.5);
+            border: 1.5px solid rgba(0, 217, 255, 0.2);
             color: #fff;
             padding: 14px 18px;
             border-radius: var(--radius-btn);
@@ -165,9 +171,12 @@
         }
 
         .control-item:focus {
-            border-color: #0A84FF;
-            background: rgba(10, 84, 200, 0.12);
-            box-shadow: 0 0 20px rgba(10, 132, 255, 0.4), inset 0 0 20px rgba(10, 132, 255, 0.1);
+            border-color: var(--glow-cyan);
+            background: rgba(0, 217, 255, 0.08);
+            box-shadow:
+                0 0 15px rgba(0, 217, 255, 0.5),
+                0 0 30px rgba(255, 20, 147, 0.2),
+                inset 0 0 15px rgba(0, 217, 255, 0.08);
             transform: scale(1.01);
         }
 
@@ -215,13 +224,18 @@
             flex-direction: column;
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(20, 25, 55, 0.6);
+            border: 1.5px solid rgba(0, 217, 255, 0.15);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 217, 255, 0.1);
         }
         .card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(0, 217, 255, 0.15);
+            border-color: rgba(0, 217, 255, 0.3);
         }
         .card-header {
             position: relative;
@@ -253,9 +267,13 @@
         @media (min-width: 768px) { .btn { width: auto; min-height: auto; } }
 
         .btn-primary {
-            background: var(--gradient-accent);
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3) 0%, rgba(255, 20, 147, 0.2) 100%);
+            border: 1.5px solid;
+            border-image: linear-gradient(135deg, var(--glow-cyan) 0%, var(--glow-magenta) 100%) 1;
             color: white;
-            box-shadow: 0 15px 35px rgba(10, 132, 255, 0.25);
+            box-shadow:
+                0 0 15px rgba(0, 217, 255, 0.4),
+                0 0 30px rgba(255, 20, 147, 0.2);
         }
         .btn-primary:active {
             transform: scale(0.95);
@@ -276,7 +294,8 @@
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.2);
             margin-right: 6px;
         }
 
@@ -289,11 +308,11 @@
         .list-row {
             display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(30, 35, 70, 0.4);
             padding: 12px 18px;
             border-radius: 14px;
             margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(0, 217, 255, 0.15);
             gap: 12px;
         }
         .list-name { flex: 1; font-size: 0.95rem; line-height: 1.4; }
@@ -326,11 +345,13 @@
             position: relative;
             width: 100%;
             max-width: 400px;
-            background: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(30, 35, 70, 0.8) 0%, rgba(20, 25, 60, 0.75) 100%);
             border-radius: 32px;
             padding: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1.5px solid rgba(0, 217, 255, 0.2);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 217, 255, 0.15);
         }
         
         .loader { display: none; width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: rotation 1s linear infinite; margin-left: 10px; }
