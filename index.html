@@ -57,13 +57,15 @@
         /* Security Input Masking */
         .no-save-pass { -webkit-text-security: disc !important; text-security: disc !important; }
 
-        /* NIGHT GLASS VIDEO BACKGROUND */
+        /* NIGHT GLASS IMAGE BACKGROUND */
         .night-bg {
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
-            object-fit: cover;
+            background-image: url('https://i.imgur.com/J3ZEdiB.png');
+            background-size: cover;
+            background-position: center;
             z-index: -2;
             background-color: #020617;
         }
@@ -218,10 +220,8 @@
 </head>
 <body class="text-white min-h-[100dvh] w-full relative overflow-x-hidden selection:bg-purple-500/30 font-sans flex flex-col items-center justify-start antialiased custom-scroll pt-6 sm:pt-12">
 
-    <!-- Fullscreen Video Background -->
-    <video id="bgVideo" class="night-bg" autoplay loop muted playsinline>
-        <source src="https://i.imgur.com/qY8V0Ou.mp4" type="video/mp4">
-    </video>
+    <!-- Fullscreen Background Image -->
+    <div class="night-bg"></div>
     <div class="night-overlay"></div>
 
     <main class="relative z-10 w-full max-w-7xl mx-auto p-4 sm:p-8 flex-1 flex flex-col items-center">
